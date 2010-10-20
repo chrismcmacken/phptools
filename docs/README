@@ -1,7 +1,8 @@
 Licensing
 -------------------------------
 All contributed code should include the license statement at the top of each 
-source file. The license statement can be found in docs/license.
+source file. The license statement can be found in docs/license. Make sure you
+replace the fields contained in <> with their proper values.
 
 Directory Naming Convention
 -------------------------------
