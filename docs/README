@@ -1,0 +1,13 @@
+Licensing
+-------------------------------
+All contributed code should include the license statement at the top of each 
+source file. The license statement can be found in docs/license.
+
+Directory Naming Convention
+-------------------------------
+Each package or tool should be placed in it's own directory and be included by
+including a single file in any project. Each package should also have a README
+file inside of it's root folder describing how to use the package. For example 
+the DB project would reside inside of a directory called DB in the root of the 
+repository, with a README document at /DB/README that explains how to use the
+project.
