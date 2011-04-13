@@ -85,7 +85,7 @@ class DB {
 		}
 
 		// Fatally error if the support files do not exist
-		$filenameBase = dirname(__FILE__) . '/' . $components['scheme'];
+		$filenameBase = __DIR__ . '/' . $components['scheme'];
 		$className = 'DB_' . ucfirst($components['scheme']);
 		require_once($filenameBase . '.class.php');
 		require_once($filenameBase . '-result.class.php');
