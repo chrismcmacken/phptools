@@ -1,4 +1,4 @@
-Copyright (c) <year> <copyright holders>
+Copyright (c) <year> individual committers of the code
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ dealings in this Software without prior written authorization.
 
 The end-user documentation included with the redistribution, if any, must 
 include the following acknowledgment: "This product includes software developed 
-by <copyright holders> and contributors", in the same place and form as other 
-third-party acknowledgments. Alternately, this acknowledgment may appear in the 
-software itself, in the same form and location as other such third-party 
+by contributors", in the same place and form as other third-party
+acknowledgments. Alternately, this acknowledgment may appear in the software
+itself, in the same form and location as other such third-party
 acknowledgments.
