@@ -1,7 +1,7 @@
 <?php
 
 /*
- Copyright (c) <year> individual committers of the code
+ Copyright (c) 2011 individual committers of the code
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
