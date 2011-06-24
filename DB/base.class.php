@@ -239,6 +239,53 @@ abstract class DB_Base {
 
 
 	/**
+	 * Generate and execute a bulk INSERT INTO statement
+	 *
+	 * Supported options:
+	 *    sql - Return generated code
+	 *
+	 * @param string $table Table name
+	 * @param array $dataArray array of Associative arrays (fieldName => value)
+	 * @param mixed $options Additional options
+	 * @return mixed True/false for success or generated SQL
+	 */
+    public function insertBulk($table, $dataArray, $options = false) {
+        $options = $this->parseOptions($options);
+		$fields = array();
+        $firstArray = reset($dataArray);
+		foreach ($firstArray as $k => $v) {
+			$fields[] = $this->fieldName($k);
+		}
+		$sql = 'INSERT INTO ' . $this->tableName($table) . ' (';
+		$sql .= implode(', ', $fields) . ') VALUES';
+
+        $insertArray = array();
+        //build our bulk query
+        foreach($dataArray as $data) {
+            $values = array();
+            foreach($data as $value) {
+                $values[] = $this->toSqlValue($value);
+            }
+
+            $insertArray[] = '(' . implode(', ', $values) . ')';
+        }
+
+        $sql .= ' ' . implode(', ', $insertArray);
+
+        if(! empty($options['sql'])) {
+            return $sql;
+        }
+
+        $result = $this->query($sql);
+        if(! $result) {
+            return false;
+        }
+
+        return $result;
+    }
+
+
+	/**
 	 * Generate and execute an INSERT statement
 	 *
 	 * Supported options:
