@@ -80,6 +80,10 @@ class DB {
 			}
 		}
 
+		if ('undefined' === $components['scheme']) {
+			throw new Exception('No DB type defined in DSN: ' . $uri);
+		}
+
 		if (! preg_match('/^[a-z0-9]+$/', $components['scheme'])) {
 			throw new Exception('Invalid DB type: ' . $components['scheme']);
 		}

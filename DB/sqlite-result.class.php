@@ -33,10 +33,10 @@
  */
 
 /**
- * MySQL specific result class
+ * SQLite specific result class
  */
 
-class DB_Mysql_Result extends DB_Result {
+class DB_Sqlite_Result extends DB_Result {
 	protected $resource = null;
 
 	/**
@@ -52,11 +52,10 @@ class DB_Mysql_Result extends DB_Result {
 
 		if (false === $resource) {
 			throw new Exception('SQLite Error: ' . $errorMessage);
-		} elseif (! is_bool($resource)) {
+		} else {
 			$this->resource = $resource;
 			$this->setNumberOfRows(sqlite_num_rows($resource));
 			$this->columns = $this->getColumnTypes();
-		} else {
 			$this->rowsAffected = sqlite_changes($this->connection);
 			$this->lastId = sqlite_last_insert_rowid($this->connection);
 		}

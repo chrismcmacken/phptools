@@ -34,7 +34,7 @@
 
 require_once(dirname(__FILE__) . '/base.class.php');
 
-class DB_Mysql extends DB_Base {
+class DB_Sqlite extends DB_Base {
 	protected $connection;  // Database connection
 
 
@@ -54,9 +54,9 @@ class DB_Mysql extends DB_Base {
 		}
 
 		if ($this->persist && function_exists('sqlite_popen')) {
-			$this->connection = @sqlite_popen($this->db, $mode, $errorMessage);
+			$this->connection = @sqlite_popen('/' . $this->db, $mode, $errorMessage);
 		} elseif (function_exists('sqlite_open')) {
-			$this->connection = @sqlite_open($this->db, $mode, $errorMessage);
+			$this->connection = @sqlite_open('/' . $this->db, $mode, $errorMessage);
 		} else {
 			throw new Exception('PHP does not have SQLite functions enabled');
 		}
