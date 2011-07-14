@@ -33,8 +33,8 @@ acknowledgments.
 */
 
 /**
- * This class grants access to all of an object's private and protected properties and methods from
- * outside of the class for testing purposes.
+ * This class grants access to all of an object's private and protected
+ * properties and methods from outside of the class for testing purposes.
  * 
  * @throws ErrorException
  */
@@ -48,6 +48,7 @@ class Friend {
     
     /**
      * @param  $object Object the object to create a friend from
+	 * @throws ErrorException Indicated method can not be called
      */
     public function __construct($object) {
 
@@ -65,11 +66,22 @@ class Friend {
      * @param  $name
      * @param  $arguments
      * @return mixed The result of the invoked method
+	 * @throws ErrorException Indicated method can not be called
      */
     public function __call($name, $arguments) {
-        $reflectionMethod = new ReflectionMethod($this->object, $name);
-        $reflectionMethod->setAccessible(true);
-        return $reflectionMethod->invokeArgs($this->object, $arguments);
+		try {
+			$reflectionMethod = new ReflectionMethod($this->object, $name);
+			$reflectionMethod->setAccessible(true);
+		} catch (Exception $e) {
+			$reflectionMethod = null;
+		}
+
+		if ($reflectionMethod) {
+			// Don't put this in the try/catch since it could rightfully throw
+			return $reflectionMethod->invokeArgs($this->object, $arguments);
+		}
+
+		return $this->callMagic('__call', array($name, $arguments), 'Method ' . $name . ' does not exist');
     }
 
 
@@ -81,7 +93,10 @@ class Friend {
      */
     public function __get($name) {
         $property = $this->getProperty($name);
-        return $property->getValue($this->object);
+		if (! is_null($property)) {
+			return $property->getValue($this->object);
+		}
+		return $this->callMagic('__get', array($name), 'Property ' . $name . ' does not exist');
     }
 
 
@@ -94,7 +109,10 @@ class Friend {
      */
     public function __set($name, $value) {
         $property = $this->getProperty($name);
-        $property->setValue($this->object, $value);
+		if (! is_null($property)) {
+			return $property->setValue($this->object, $value);
+		}
+		return $this->callMagic('__set', array($name, $value), 'Property ' . $name . ' does not exist');
     }
 
 
@@ -106,8 +124,11 @@ class Friend {
      */
     public function __isset($name){
         $property = $this->getProperty($name);
-        $value = $property->getValue($this->object);
-        return isset($value);
+		if (! is_null($property)) {
+			$value = $property->getValue($this->object);
+			return isset($value);
+		}
+		return $this->callMagic('__isset', array($name), 'Property ' . $name . ' does not exist');
     }
 
 
@@ -119,8 +140,30 @@ class Friend {
      */
     public function __unset($name) {
         $property = $this->getProperty($name);
-        $property->setValue($this->object, null);
+		if (! is_null($property)) {
+			$property->setValue($this->object, null);
+			return;
+		}
+		$this->callMagic('__unset', array($name), 'Property ' . $name . ' does not exist');
     }
+
+
+	/**
+	 * Call a "magic method" on the targeted class, if possible
+	 *
+	 * @param string $method
+	 * @param mixed $arguments
+	 * @param string $errorMessage Used in ErrorException
+	 * @return mixed Value from called function
+	 * @throws ErrorException Method does not exist
+	 */
+	 protected function callMagic($method, $arguments, $errorMessage) {
+		 if (! method_exists($this->object, $method)) {
+			 throw new ErrorException($errorMessage);
+		 }
+
+		 return call_user_func_array(array($this->object, $method), (array) $arguments);
+	 }
 
 
     /**
@@ -130,8 +173,13 @@ class Friend {
      * @return ReflectionProperty
      */
     protected function getProperty($name){
-        $property = new ReflectionProperty($this->object, $name);
-        $property->setAccessible(true);
-        return $property;
+		try {
+			$property = new ReflectionProperty($this->object, $name);
+			$property->setAccessible(true);
+			return $property;
+		} catch (Exception $e) {
+			// Do nothing
+		}
+		return null;
     }
 }
