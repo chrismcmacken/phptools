@@ -226,6 +226,11 @@ class WebRequest {
 				throw new ErrorException($formInputName . ' reported error during upload', $fileInfo['error']);
 			}
 
+			// Double-check the temp file exists
+			if (! file_exists($fileInfo['tmp_name']) || ! is_file($fileInfo['tmp_name'])) {
+				throw new ErrorException($formInputName . ' lists a temporary file that does not exist or is not a regular file');
+			}
+
 			// Double-check size
 			if (filesize($fileInfo['tmp_name']) != $fileInfo['size']) {
 				throw new ErrorException($formInputName . ' has a size mismatch');
