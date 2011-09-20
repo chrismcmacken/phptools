@@ -140,6 +140,33 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Gets the line number for a token passed in
+	 *
+	 * @param array $token
+	 * @return integer
+	 */
+	public function getLine($token) {
+		return $token[2];
+	}
+
+
+	/**
+	 * Gets the match for a token passed in.  If there is no need for
+	 * a match, return null.  If no match was found, return false.
+	 *
+	 * @param array $token
+	 * @return integer|null|false
+	 */
+	public function getMatch($token) {
+		if (! array_key_exists(3, $token)) {
+			return null;
+		}
+
+		return $token[3];
+	}
+
+
+	/**
 	 * Gets the name for a token or for the token at an offset
 	 *
 	 * @param mixed $token Token array or token constant
@@ -402,7 +429,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 				case T_TOKENIZER_BRACE_LEFT:
 				case T_TOKENIZER_BRACKET_LEFT:
 				case T_TOKENIZER_PAREN_LEFT:
-					$tokens[$key][3] = null;
+					$tokens[$key][3] = false;
 					$matchStack[] = $key;
 					break;
 
@@ -417,7 +444,6 @@ class Tokenizer implements ArrayAccess, Iterator {
 					break;
 
 				default:
-					$tokens[$key][3] = $key;
 			}
 
 			$lastLineNumber = $token[2] + substr_count($token[1], PHP_EOL);

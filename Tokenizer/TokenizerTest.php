@@ -75,18 +75,19 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 		$actual = '';
 
 		foreach ($tokenizer as $key => $token) {
-			$match = $token[3];
-
-			if (is_null($match)) {
-				$match = 'null';
-			}
-
 			$line = array(
 				$tokenizer->getName($token),
-				// Skip content since it could contain newlines
-				$token[2],  // line number
-				$match,  // match
+				$tokenizer->getLine($token),
 			);
+			$match = $tokenizer->getMatch($token);
+
+			if (! is_null($match)) {
+				if ($match === false) {
+					$match = 'false';
+				}
+				$line[] = $match;
+			}
+
 			$actual .= implode(' ', $line) . "\n";
 		}
 
