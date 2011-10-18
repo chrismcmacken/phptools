@@ -264,10 +264,19 @@ class Session2 {
 			return false;
 		}
 
-		if (! file_exists(session_save_path() . '/sess_' . $id)) {
-			return false;
+		$sessionFile = "/sess_{$id}";
+		$fileArray = array(
+			session_save_path() . $sessionFile,
+			"/private/var/tmp/{$sessionFile}"
+		);
+		
+		$fileExists = false;
+		foreach($fileArray as $fileName) {
+			if(file_exists($fileName)) {
+				$fileExists = true;
+			}
 		}
 
-		return true;
+		return $fileExists;
 	}
 }
