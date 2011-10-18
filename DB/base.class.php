@@ -60,16 +60,22 @@ abstract class DB_Base {
 		$this->db = substr($components['path'], 1);  // Remove leading slash
 		$this->hostPort = $components['host'];
 		$this->password = $components['pass'];
-		$this->prefix = $components['fragment'];
 		$this->scheme = $components['scheme'];
 		$this->username = $components['user'];
+
+		if(! empty($components['fragment'])) {
+			$this->prefix = $components['fragment'];
+		}
 
 		if (! empty($components['port'])) {
 			$this->hostPort .= ':' . $components['port'];
 		}
 
 		// Handle options
-		parse_str($components['query'], $options);
+		$options = array();
+		if(! empty($components['query'])) {
+			parse_str($components['query'], $options);
+		}
 
 		if (array_key_exists('persist', $options)) {
 			$this->persist = true;
@@ -78,8 +84,8 @@ abstract class DB_Base {
 		// Keep a list of the last database selected for each host.
 		$this->lastDbKey = $this->dbKey();
 
-		if (! isset($this->lastDb[$this->lastDbKey])) {
-			$this->lastDb[$this->lastDbKey] = '';
+		if (! isset(static::$lastDb[$this->lastDbKey])) {
+			static::$lastDb[$this->lastDbKey] = '';
 		}
 	}
 
@@ -146,8 +152,8 @@ abstract class DB_Base {
 	 * @return boolean True on success
 	 */
 	protected function dbSwitchIfNeeded() {
-		if ($this->lastDb[$this->lastDbKey] !== $this->db) {
-			$this->lastDb[$this->lastDbKey] = $this->db;
+		if (static::$lastDb[$this->lastDbKey] !== $this->db) {
+			static::$lastDb[$this->lastDbKey] = $this->db;
 			return $this->dbSwitch($this->db);
 		}
 
