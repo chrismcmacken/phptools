@@ -2,7 +2,7 @@
 
 spl_autoload_register(function ($name) {
 	$filename = '_' . strtolower($name) . '.class.php';
-	$filename = str_replace('_', PATH_SEPARATOR);
+	$filename = str_replace('_', PATH_SEPARATOR, $filename);
 	$filename = __DIR__ . $filename;
 
 	if (file_exists($filename)) {
