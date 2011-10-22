@@ -32,7 +32,7 @@
  acknowledgments.
  */
 
-require_once('Tokenizer.class.php');
+require_once('tokenizer.class.php');
 
 class TokenizerTest extends PHPUnit_Framework_TestCase {
 	/**
