@@ -452,7 +452,9 @@ abstract class DB_Base {
 		}
 
 		$this->dbSwitchIfNeeded();
-		$resultClass = get_class($this) . '_Result';
+		$resultClass = get_class($this);
+		$resultClass = substr($resultClass, 0, -7);
+		$resultClass .= '_Result';
 		$result = new $resultClass($this->connection, $sql);
 		
 		if (isset($options['one'])) {
