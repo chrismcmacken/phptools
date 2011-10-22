@@ -110,6 +110,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	);
 
 	protected $currentToken = 0;
+	protected $isValid = true;
 	protected $tokens = array();
 	static protected $unknownTokenName = null;
 
@@ -122,6 +123,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	protected function __construct($tokens) {
 		$this->tokens = $this->standardizeTokens($tokens);
 		$this->currentToken = 0;
+		$this->isValid = true;
 	}
 
 
@@ -299,6 +301,11 @@ class Tokenizer implements ArrayAccess, Iterator {
 	}
 
 
+	public function isValid() {
+		return $this->isValid;
+	}
+
+
 	/**
 	 * Move to the next token in the list
 	 *
@@ -420,17 +427,38 @@ class Tokenizer implements ArrayAccess, Iterator {
 				$backtickIsLeft = ! $backtickIsLeft;
 			}
 
+			$matchOpen = function ($find) use (&$tokens, $key, &$matchStack) {
+				$tokens[$key][3] = false;
+				$matchStack[] = array($find, $key);
+			};
+
 			switch ($token[0]) {
 				case T_CURLY_OPEN:
 				case T_DOLLAR_OPEN_CURLY_BRACES:
+				case T_TOKENIZER_BRACE_LEFT:
+					$tokens[$key][3] = false;
+					$matchStack[] = array(T_TOKENIZER_BRACE_RIGHT, $key);
+					break;
+
 				case T_OPEN_TAG:
 				case T_OPEN_TAG_WITH_ECHO:
+					$tokens[$key][3] = false;
+					$matchStack[] = array(T_CLOSE_TAG, $key);
+					break;
+
 				case T_TOKENIZER_BACKTICK_LEFT:
-				case T_TOKENIZER_BRACE_LEFT:
+					$tokens[$key][3] = false;
+					$matchStack[] = array(T_TOKENIZER_BACKTICK_RIGHT, $key);
+					break;
+
 				case T_TOKENIZER_BRACKET_LEFT:
+					$tokens[$key][3] = false;
+					$matchStack[] = array(T_TOKENIZER_BRACKET_RIGHT, $key);
+					break;
+
 				case T_TOKENIZER_PAREN_LEFT:
 					$tokens[$key][3] = false;
-					$matchStack[] = $key;
+					$matchStack[] = array(T_TOKENIZER_PAREN_RIGHT, $key);
 					break;
 
 				case T_CLOSE_TAG:
@@ -438,9 +466,18 @@ class Tokenizer implements ArrayAccess, Iterator {
 				case T_TOKENIZER_BRACE_RIGHT:
 				case T_TOKENIZER_BRACKET_RIGHT:
 				case T_TOKENIZER_PAREN_RIGHT:
-					$match = array_pop($matchStack);
-					$tokens[$key][3] = $match;
-					$tokens[$match][3] = $key;
+					if ($this->isValid) {
+						$match = array_pop($matchStack);
+						if ($token[0] != $match[0]) {
+							$tokens[$key][3] = false;
+							$this->isValid = false;
+						} else {
+							$tokens[$key][3] = $match[1];
+							$tokens[$match[1]][3] = $key;
+						}
+					} else {
+						$tokens[$key][3] = false;
+					}
 					break;
 
 				default:
