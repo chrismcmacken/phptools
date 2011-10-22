@@ -34,7 +34,7 @@
 
 require_once(dirname(__FILE__) . '/base.class.php');
 
-class DB_Sqlite extends DB_Base {
+class DB_Sqlite_Handle extends DB_Base {
 	protected $connection;  // Database connection
 
 

@@ -36,10 +36,11 @@
  * Help keep the various database-specific things in check by using
  * fragments.
  */
-define('DB_FRAGMENT_ANY', 'any');
-define('DB_FRAGMENT_NOW', 'now');
 
 class DB_Fragment {
+	const ANY = 'any';
+	const NOW = 'now';
+
 	protected $args;
 	protected $type;
 

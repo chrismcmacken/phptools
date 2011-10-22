@@ -826,7 +826,7 @@ abstract class DB_Base {
 			$prefixDefault = $key . ' = ';
 
 			switch ($fragment->getType()) {
-				case DB_FRAGMENT_NOW:
+				case DB_Fragment::NOW:
 					return $prefixDefault . 'NOW()';
 
 				default:
@@ -839,7 +839,7 @@ abstract class DB_Base {
 		 * used as part of an inserted value.
 		 */
 		switch ($fragment->getType()) {
-			case DB_FRAGMENT_ANY:
+			case DB_Fragment::ANY:
 				$args = $fragment->getArgs();
 				if (! count($args)) {
 					throw new Exception($fragment . ' must have arguments');
@@ -849,7 +849,7 @@ abstract class DB_Base {
 				}
 				return '(' . implode(') OR (', $args) . ')';
 
-			case DB_FRAGMENT_NOW:
+			case DB_Fragment::NOW:
 				return 'NOW()';
 			
 			default:
