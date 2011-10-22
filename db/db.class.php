@@ -101,7 +101,9 @@ class DB {
 			throw new Exception('Unloaded DB class: ' . $classNameBase . 'Result');
 		}
 
-		return new $className($components);
+		$handleClass = $classNameBase . 'Handle';
+
+		return new $handleClass($components);
 	}
 
 
