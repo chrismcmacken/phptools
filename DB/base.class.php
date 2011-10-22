@@ -42,11 +42,12 @@ abstract class DB_Base {
 	protected $db;  // The current database, if known
 	protected $hostPort;  // The host or host+port
 	static protected $lastDb = array();  // Work around PHP connection reuse
-	protected $lastDbKey;  // md5(Host + port + username + password)
+	protected $lastDbKey;  // Unique key between persisted connections
 	protected $options;  // Options to use with this connection
 	protected $password;  // Password for the connection
 	protected $persist = false;  // Try to use a persistent connection?
 	protected $prefix;  // Prefix on the table name, if any
+	protected $scheme;  // Scheme (eg. mysql)
 	protected $username;  // Username for the connection
 
 	/**
@@ -59,33 +60,32 @@ abstract class DB_Base {
 		$this->db = substr($components['path'], 1);  // Remove leading slash
 		$this->hostPort = $components['host'];
 		$this->password = $components['pass'];
-		$this->prefix = $components['fragment'];
+		$this->scheme = $components['scheme'];
 		$this->username = $components['user'];
+
+		if(! empty($components['fragment'])) {
+			$this->prefix = $components['fragment'];
+		}
 
 		if (! empty($components['port'])) {
 			$this->hostPort .= ':' . $components['port'];
 		}
 
 		// Handle options
-		parse_str($components['query'], $options);
+		$options = array();
+		if(! empty($components['query'])) {
+			parse_str($components['query'], $options);
+		}
 
 		if (array_key_exists('persist', $options)) {
 			$this->persist = true;
 		}
 
-		/* PHP reuses connections even in the same thread as long as the
-		 * host + port + username + password are the same.  This means
-		 * you might have two DB_* objects and you think they are in
-		 * separate databases, but it turns out that PHP is smarter than you
-		 * and is reusing the connection to the server for both of these
-		 * objects.  So, we need to step up our aggressive tactics a notch.
-		 *
-		 * Keep a list of the last database selected for each host.
-		 */
-		$this->lastDbKey = md5($components['scheme'] . '|' . $this->username . '|' . $this->password . '|' . $this->hostPort);
+		// Keep a list of the last database selected for each host.
+		$this->lastDbKey = $this->dbKey();
 
-		if (! isset($this->lastDb[$this->lastDbKey])) {
-			$this->lastDb[$this->lastDbKey] = '';
+		if (! isset(static::$lastDb[$this->lastDbKey])) {
+			static::$lastDb[$this->lastDbKey] = '';
 		}
 	}
 
@@ -102,6 +102,34 @@ abstract class DB_Base {
 	public function db($db) {
 		$this->db = $db;
 		return $this->dbSwitchIfNeeded();
+	}
+
+
+	/**
+	 * Generates a unique key that will be the same if two DB connections
+	 * might use the same persisted connection.
+	 * 
+	 * Often, PHP reuses connections even in the same thread as long as the
+	 * host + port + username + password are the same.  This means
+	 * you might have two DB_* objects and you think they are in
+	 * separate databases, but it turns out that PHP is smarter than you
+	 * and is reusing the connection to the server for both of these
+	 * objects.  So, we need to step up our aggressive tactics a notch.
+	 *
+	 * This function will return a string that will be the same when two
+	 * DB objects might share connections.  This key is used to determine
+	 * if we need to issue 'USE' statements.
+	 *
+	 * @return string Some sort of key
+	 */
+	protected function dbKey() {
+		$parts = array(
+			$this->scheme,
+			$this->username,
+			$this->password,
+			$this->hostPort
+		);
+		return md5(implode('|', $parts));
 	}
 
 
@@ -124,8 +152,8 @@ abstract class DB_Base {
 	 * @return boolean True on success
 	 */
 	protected function dbSwitchIfNeeded() {
-		if ($this->lastDb[$this->lastDbKey] !== $this->db) {
-			$this->lastDb[$this->lastDbKey] = $this->db;
+		if (static::$lastDb[$this->lastDbKey] !== $this->db) {
+			static::$lastDb[$this->lastDbKey] = $this->db;
 			return $this->dbSwitch($this->db);
 		}
 
@@ -236,6 +264,53 @@ abstract class DB_Base {
 	public function fluent() {
 		return new DB_Fluent($this);
 	}
+
+
+	/**
+	 * Generate and execute a bulk INSERT INTO statement
+	 *
+	 * Supported options:
+	 *    sql - Return generated code
+	 *
+	 * @param string $table Table name
+	 * @param array $dataArray array of Associative arrays (fieldName => value)
+	 * @param mixed $options Additional options
+	 * @return mixed True/false for success or generated SQL
+	 */
+    public function insertBulk($table, $dataArray, $options = false) {
+        $options = $this->parseOptions($options);
+		$fields = array();
+        $firstArray = reset($dataArray);
+		foreach ($firstArray as $k => $v) {
+			$fields[] = $this->fieldName($k);
+		}
+		$sql = 'INSERT INTO ' . $this->tableName($table) . ' (';
+		$sql .= implode(', ', $fields) . ') VALUES';
+
+        $insertArray = array();
+        //build our bulk query
+        foreach($dataArray as $data) {
+            $values = array();
+            foreach($data as $value) {
+                $values[] = $this->toSqlValue($value);
+            }
+
+            $insertArray[] = '(' . implode(', ', $values) . ')';
+        }
+
+        $sql .= ' ' . implode(', ', $insertArray);
+
+        if(! empty($options['sql'])) {
+            return $sql;
+        }
+
+        $result = $this->query($sql);
+        if(! $result) {
+            return false;
+        }
+
+        return $result;
+    }
 
 
 	/**
