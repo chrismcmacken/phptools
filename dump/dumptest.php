@@ -32,7 +32,7 @@
  acknowledgments.
  */
 
-require_once('Dump.class.php');
+require_once('dump.class.php');
 
 class DumpTest extends PHPUnit_Framework_TestCase {
 	/**
