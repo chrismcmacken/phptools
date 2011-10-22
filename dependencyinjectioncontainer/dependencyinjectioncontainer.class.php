@@ -89,12 +89,14 @@ class DependencyInjectionContainer {
 		if (! isset($this->values[$id])) {
 			throw new InvalidArgumentException('Value "' . $id . '" is not defined');
 		}
+
+		$return = $this->values[$id];
 		
-		if (is_callable($this->values[$id])) {
-			return $this->values[$id]($this, $id);
+		if (is_callable($return)) {
+			return $return($this, $id);
 		}
 		
-		return $this->values[$id];
+		return $return;
 	}
 	
 
