@@ -32,8 +32,8 @@
  acknowledgments.
  */
 
-require_once(dirname(__FILE__) . '/fragment.class.php');
-require_once(dirname(__FILE__) . '/result.class.php');
+require_once(__DIR__ . '/db/fragment.class.php');
+require_once(__DIR__ . '/db/result.class.php');
 
 /**
  * Connect to a database and create chunks for use in DB classes
@@ -50,7 +50,7 @@ class DB {
 	 * @return DB_Fragment ANY
 	 */
 	static public function any() {
-		$fragment = new DB_Fragment(DB_FRAGMENT_ANY, func_get_args());
+		$fragment = new DB_Fragment(DB_Fragment::ANY, func_get_args());
 		return $fragment;
 	}
 
@@ -89,13 +89,16 @@ class DB {
 		}
 
 		// Fatally error if the support files do not exist
-		$filenameBase = __DIR__ . '/' . $components['scheme'];
-		$className = 'DB_' . ucfirst($components['scheme']);
-		require_once($filenameBase . '.class.php');
-		require_once($filenameBase . '-result.class.php');
+		$filenameBase = __DIR__ . '/db/' . $components['scheme'] . '/';
+		$classNameBase = 'DB_' . ucfirst($components['scheme']) . '_';
+		require_once($filenameBase . 'handle.class.php');
+		require_once($filenameBase . 'result.class.php');
 
-		if (! class_exists($className)) {
-			throw new Exception('Unloaded DB class: ' . $className);
+		if (! class_exists($classNameBase . 'Handle')) {
+			throw new Exception('Unloaded DB class: ' . $classNameBase . 'Handle');
+		}
+		if (! class_exists($classNameBase . 'Result')) {
+			throw new Exception('Unloaded DB class: ' . $classNameBase . 'Result');
 		}
 
 		return new $className($components);
@@ -108,7 +111,7 @@ class DB {
 	 * @return DB_Fragment NOW
 	 */
 	static public function now() {
-		$fragment = new DB_Fragment(DB_FRAGMENT_NOW);
+		$fragment = new DB_Fragment(DB_Fragment::NOW);
 		return $fragment;
 	}
 }
