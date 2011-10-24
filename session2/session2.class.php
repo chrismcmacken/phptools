@@ -114,12 +114,14 @@ class Session2 {
 	}
 
 	/**
-	 * Destroys the session thoroughly.
+	 * Destroys the session thoroughly
 	 */
 	public function destroy() {
 		session_unset();
 		session_destroy();
 		$this->removeHeaders();
+		$sessionCookieHeader = 'Set-Cookie: ' . session_name() . '=';
+		setcookie(session_name(), "", 1, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));
 	}
 
 	/**
