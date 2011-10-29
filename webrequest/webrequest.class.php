@@ -145,6 +145,37 @@ class WebRequest {
 	}
 
 	/**
+	 * Returns true if the request is a GET
+	 *
+	 * @return boolean
+	 */
+	public function isGet() {
+		return 'GET' == $this->method();
+	}
+
+	/**
+	 * Returns true if the request is a POST
+	 *
+	 * @return boolean
+	 */
+	public function isPost() {
+		return 'POST' == $this->method();
+	}
+
+	/**
+	 * Return the request method, always in upper case
+	 *
+	 * It might be anything from this list:
+	 *    GET, POST, PUT, DELETE, HEAD, OPTIONS, TRACE, CONNECT
+	 * Most likely it will just be the first four.
+	 *
+	 * @return string
+	 */
+	public function method() {
+		return strtoupper($_SERVER['REQUEST_METHOD']);
+	}
+
+	/**
 	 * Return a single post value or all posted values
 	 *
 	 * @param string $name optional
