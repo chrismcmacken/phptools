@@ -108,6 +108,50 @@ class DB {
 
 
 	/**
+	 * Return the "greater than" database fragment
+	 *
+	 * @return DB_Fragment GT
+	 */
+	static public function gt($value) {
+		$fragment = new DB_Fragment(DB_Fragment::GT, $value);
+		return $fragment;
+	}
+
+
+	/**
+	 * Return the "greater than or equal to" database fragment
+	 *
+	 * @return DB_Fragment GTE
+	 */
+	static public function gte($value) {
+		$fragment = new DB_Fragment(DB_Fragment::GTE, $value);
+		return $fragment;
+	}
+
+
+	/**
+	 * Return the "less than" database fragment
+	 *
+	 * @return DB_Fragment LT
+	 */
+	static public function lt($value) {
+		$fragment = new DB_Fragment(DB_Fragment::LT, $value);
+		return $fragment;
+	}
+
+
+	/**
+	 * Return the "less than or equal to" database fragment
+	 *
+	 * @return DB_Fragment LTE
+	 */
+	static public function lte($value) {
+		$fragment = new DB_Fragment(DB_Fragment::LTE, $value);
+		return $fragment;
+	}
+
+
+	/**
 	 * Return the NOW database fragment
 	 *
 	 * @return DB_Fragment NOW

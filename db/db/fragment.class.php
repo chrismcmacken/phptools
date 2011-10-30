@@ -39,6 +39,10 @@
 
 class DB_Fragment {
 	const ANY = 'any';
+	const GT = 'gt';
+	const GTE = 'gte';
+	const LT = 'lt';
+	const LTE = 'lte';
 	const NOW = 'now';
 
 	protected $args;
@@ -52,7 +56,12 @@ class DB_Fragment {
 	 */
 	public function __construct($fragmentType, $args = null) {
 		switch ($fragmentType) {
-			case DB_FRAGMENT_NOW:
+			case DB_Fragment::ANY:
+			case DB_Fragment::GT:
+			case DB_Fragment::GTE:
+			case DB_Fragment::LT:
+			case DB_Fragment::LTE:
+			case DB_Fragment::NOW:
 				// Valid
 				break;
 

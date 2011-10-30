@@ -812,11 +812,18 @@ abstract class DB_Base {
 			if ($value instanceOf DB_Fragment) {
 				// No prefix on this
 				return $this->sqlFromFragment($value, $key);
+			} elseif ($value instanceOf DateTime) {
+				return $prefix . $this->sqlFromDateTime($value);
 			}
 			return $prefix . $this->quote($value->__toString());
 		}
 
 		return $prefix . $this->quote($value);
+	}
+
+
+	public function sqlFromDateTime($dateTime) {
+		return $this->quote($dateTime->format('Y-m-d H:i:s'));
 	}
 
 
@@ -828,6 +835,19 @@ abstract class DB_Base {
 			$prefixDefault = $key . ' = ';
 
 			switch ($fragment->getType()) {
+				// DB_Fragment::ANY is not valid here
+				case DB_Fragment::GT:
+					return $key . ' > ' . $this->toSqlValue($fragment->getArgs());
+
+				case DB_Fragment::GTE:
+					return $key . ' >= ' . $this->toSqlValue($fragment->getArgs());
+
+				case DB_Fragment::LT:
+					return $key . ' < ' . $this->toSqlValue($fragment->getArgs());
+
+				case DB_Fragment::LTE:
+					return $key . ' <= ' . $this->toSqlValue($fragment->getArgs());
+
 				case DB_Fragment::NOW:
 					return $prefixDefault . 'NOW()';
 
