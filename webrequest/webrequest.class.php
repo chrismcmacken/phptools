@@ -61,7 +61,13 @@ class WebRequest {
 		$this->cookies = $_COOKIE ?: array();
 		$this->files = $_FILES ?: array();
 		$this->get = $_GET ?: array();
-		$this->post = $_POST ?: array();
+
+		// Only process POST variables if the request is a POST
+		if ($this->isPost()) {
+			$this->post = $_POST ?: array();
+		} else {
+			$this->post = array();
+		}
 
 		if ($destroySuperglobals) {
 			$superglobalNames = array(
