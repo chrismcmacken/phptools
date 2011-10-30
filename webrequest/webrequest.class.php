@@ -244,7 +244,7 @@ class WebRequest {
 	 * @return array Cleansed files
 	 * @throws ErrorException Unsafe file found
 	 */
-	protected function santizeFiles($files) {
+	protected function sanitizeFiles($files) {
 		$out = array();
 
 		foreach ($files as $formInputName => $fileInfo) {
