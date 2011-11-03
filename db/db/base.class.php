@@ -822,6 +822,23 @@ abstract class DB_Base {
 	}
 
 
+	public function toSqlValueInList($list, $key) {
+		$out = array();
+		
+		foreach ($list as $singleValue) {
+			$out[] = $this->toSqlValue($singleValue);
+		} 
+
+		$out = '(' . implode(', ', $out) . ')';
+
+		if ($key) {
+			$out = $key . ' IN ' . $out;
+		}
+
+		return $out;
+	}
+
+
 	public function sqlFromDateTime($dateTime) {
 		return $this->quote($dateTime->format('Y-m-d H:i:s'));
 	}
@@ -850,6 +867,20 @@ abstract class DB_Base {
 
 				case DB_Fragment::LTE:
 					return $key . ' <= ' . $this->toSqlValue($fragment->getArgs());
+
+				case DB_Fragment::NOT:
+					$notArgs = $fragment->getArgs();
+					$notArgs = $notArgs[0];
+
+					if (is_array($notArgs)) {
+						return $key . ' NOT IN ' . $this->toSqlValueInList($notArgs);
+					}
+
+					if (is_null($notArgs)) {
+						return $key . ' IS NOT NULL';
+					}
+
+					return $key . ' <> ' . $this->toSqlValue($notArgs);
 
 				case DB_Fragment::NOW:
 					return $prefixDefault . 'NOW()';
@@ -984,11 +1015,7 @@ abstract class DB_Base {
 					/* FIELD => array(...)
 					 * sql => array(...)
 					 */
-					$valueList = array();
-					foreach ($v as $singleValue) {
-						$valueList[] = $this->toSqlValue($singleValue);
-					}
-					$out[] = $k . ' IN (' . implode(', ', $valueList) . ')';
+					$out[] = $this->toSqlValueInList($v, $k);
 				} elseif (is_null($v)) {
 					/* FIELD => null
 					 * sql => null

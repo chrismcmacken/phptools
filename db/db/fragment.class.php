@@ -44,6 +44,7 @@ class DB_Fragment {
 	const LIKE = 'like';
 	const LT = 'lt';
 	const LTE = 'lte';
+	const NOT = 'now';
 	const NOW = 'now';
 
 	protected $args;
@@ -63,6 +64,7 @@ class DB_Fragment {
 			case DB_Fragment::LIKE:
 			case DB_Fragment::LT:
 			case DB_Fragment::LTE:
+			case DB_Fragment::NOT:
 			case DB_Fragment::NOW:
 				// Valid
 				break;

@@ -163,6 +163,17 @@ class DB {
 
 
 	/**
+	 * Return the NOT database fragment
+	 *
+	 * @return DB_Fragment NOT
+	 */
+	static public function not() {
+		$fragment = new DB_Fragment(DB_Fragment::NOT);
+		return $fragment;
+	}
+
+
+	/**
 	 * Return the NOW database fragment
 	 *
 	 * @return DB_Fragment NOW
