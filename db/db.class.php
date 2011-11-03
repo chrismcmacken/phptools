@@ -130,6 +130,17 @@ class DB {
 
 
 	/**
+	 * Return the "like" database fragment
+	 *
+	 * @return DB_Fragment LIKE
+	 */
+	static public function like($value) {
+		$fragment = new DB_Fragment(DB_Fragment::LIKE, $value);
+		return $fragment;
+	}
+
+
+	/**
 	 * Return the "less than" database fragment
 	 *
 	 * @return DB_Fragment LT

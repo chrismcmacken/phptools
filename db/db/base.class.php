@@ -842,6 +842,9 @@ abstract class DB_Base {
 				case DB_Fragment::GTE:
 					return $key . ' >= ' . $this->toSqlValue($fragment->getArgs());
 
+				case DB_Fragment::LIKE:
+					return $key . ' LIKE ' . $this->toSqlValue($fragment->getArgs());
+
 				case DB_Fragment::LT:
 					return $key . ' < ' . $this->toSqlValue($fragment->getArgs());
 

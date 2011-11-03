@@ -41,6 +41,7 @@ class DB_Fragment {
 	const ANY = 'any';
 	const GT = 'gt';
 	const GTE = 'gte';
+	const LIKE = 'like';
 	const LT = 'lt';
 	const LTE = 'lte';
 	const NOW = 'now';
@@ -59,6 +60,7 @@ class DB_Fragment {
 			case DB_Fragment::ANY:
 			case DB_Fragment::GT:
 			case DB_Fragment::GTE:
+			case DB_Fragment::LIKE:
 			case DB_Fragment::LT:
 			case DB_Fragment::LTE:
 			case DB_Fragment::NOW:
