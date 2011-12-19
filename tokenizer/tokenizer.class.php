@@ -596,6 +596,10 @@ class Tokenizer implements ArrayAccess, Iterator {
 					}
 					break;
 
+				case T_BAD_CHARACTER:
+					$this->isValid = false;
+					break;
+
 				default:
 			}
 
