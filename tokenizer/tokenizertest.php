@@ -36,12 +36,13 @@ require_once('tokenizer.class.php');
 
 class TokenizerTest extends PHPUnit_Framework_TestCase {
 	/**
-	 * Find the various test files
+	 * Finds all test files (*.php and *.txt) in a subdirectory
 	 *
+	 * @param string $dir Directory name
 	 * @return array
 	 */
-	public function dataTokenizer() {
-		$files = glob('tests/*.php');
+	public function getTestsFromDirectory($dir) {
+		$files = glob($dir . '/*.php');
 		$tests = array();
 
 		foreach ($files as $inputFile) {
@@ -60,14 +61,24 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * Find the various test files
+	 *
+	 * @return array
+	 */
+	public function dataTokenize() {
+		return $this->getTestsFromDirectory('tests_tokenize');
+	}
+
+
+	/**
 	 * Run the test against an external PHP file and the external file
 	 * which describes the list of expected tokens
 	 *
-	 * @dataProvider dataTokenizer
+	 * @dataProvider dataTokenize
 	 * @param string $inputFile
 	 * @param string $tokenFile
 	 */
-	public function testTokenizer($inputFile, $tokenFile) {
+	public function testTokenize($inputFile, $tokenFile) {
 		$this->assertTrue(file_exists($inputFile), 'Input file missing: ' . $inputFile);
 		$this->assertTrue(file_exists($tokenFile), 'Token file missing: ' . $tokenFile);
 		$tokenizer = Tokenizer::tokenizeFile($inputFile);
@@ -92,5 +103,44 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 		}
 
 		$this->assertEquals($expected, $actual);
+	}
+
+
+	/**
+	 * Get a list of files for testing against the token finder
+	 *
+	 * @return array
+	 */
+	public function dataFind() {
+		return $this->getTestsFromDirectory('tests_find');
+	}
+
+	/**
+	 * Run tokenizer against external PHP file then compare the finder
+	 * results against the expected results from the text file
+	 *
+	 * Text file format:
+	 *
+	 * T_TOKEN_CONSTANT index1 index2 index3
+	 *
+	 * @dataProvider dataFind
+	 * @param string $inputFile
+	 * @param string $expectedFile
+	 */
+	public function testFind($inputFile, $expectedFile) {
+		$this->assertTrue(file_exists($inputFile), 'Input file missing: ' . $inputFile);
+		$this->assertTrue(file_exists($expectedFile), 'Expected results file missing: ' . $expectedFile);
+		$tokenizer = Tokenizer::tokenizeFile($inputFile);
+		$expected = file($expectedFile);
+
+		foreach ($expected as $line) {
+			$line = trim($line);
+			$expectedIndices = explode(' ', $line);
+			$tokenConstantString = array_shift($expectedIndices);
+			$tokenConstant = constant($tokenConstantString);
+			$this->assertNotNull($tokenConstant, 'Unable to find constant for string: ' . $tokenConstantString);
+			$result = $tokenizer->findTokens($tokenConstant);
+			$this->assertEquals($expectedIndices, $result);
+		}
 	}
 }

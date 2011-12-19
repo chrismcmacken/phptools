@@ -142,6 +142,38 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Finds instances of tokens, calling the callback with a Tokenizer
+	 * object initialized to that position.
+	 *
+	 * @param mixed $token T_* constant
+	 * @param function $callback Callback, taking a single parameter, optional
+	 * @return array Indices of where that token was found
+	 */
+	public function findTokens($token, $callback = null) {
+		$indices = array();
+
+		foreach ($this->tokens as $k => $v) {
+			if ($v[0] == $token) {
+				$indices[] = $k;
+			}
+		}
+
+		if (! is_null($callback)) {
+			$oldPosition = $this->currentToken;
+
+			foreach ($indices as $index) {
+				$this->currentToken = $index;
+				$callback($this);
+			}
+
+			$this->currentToken = $oldPosition;
+		}
+
+		return $indices;
+	}
+
+
+	/**
 	 * Gets the line number for a token passed in
 	 *
 	 * @param array $token
