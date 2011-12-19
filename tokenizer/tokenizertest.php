@@ -137,9 +137,14 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 			$line = trim($line);
 			$expectedIndices = explode(' ', $line);
 			$tokenConstantString = array_shift($expectedIndices);
-			$tokenConstant = constant($tokenConstantString);
-			$this->assertNotNull($tokenConstant, 'Unable to find constant for string: ' . $tokenConstantString);
-			$result = $tokenizer->findTokens($tokenConstant);
+			$tokenConstants = explode('|', $tokenConstantString);
+
+			foreach ($tokenConstants as $k => $v) {
+				$tokenConstants[$k] = constant($v);
+				$this->assertNotNull($tokenConstants[$k], 'Unable to find constant for string: ' . $tokenConstantString);
+			}
+
+			$result = $tokenizer->findTokens($tokenConstants);
 			$this->assertEquals($expectedIndices, $result);
 		}
 	}

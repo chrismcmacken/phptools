@@ -8,3 +8,7 @@ if ($you == SMART_PERSON) {
 	var_export($some_variable);
 	var_export($you);
 }
+
+if ($we === $you) {
+	throw new Exception('We aren\'t you.  Period.');
+}
