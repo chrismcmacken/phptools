@@ -261,12 +261,61 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Increment our index and return the new current token, skipping ones
+	 * that are not important
+	 *
+	 * @return array|null Null if no more tokens
+	 */
+	public function getNextImportantToken() {
+		$this->currentToken ++;
+		$token = $this->getTokenAt($this->currentToken);
+
+		while (! is_null($token) && ! $this->isImportant($token)) {
+			$this->currentToken ++;
+			$token = $this->getTokenAt($this->currentToken);
+		}
+
+		return $token;
+	}
+
+
+	/**
 	 * Increment our index and return the new current token
 	 *
 	 * @return array|null Null if no more tokens
 	 */
 	public function getNextToken() {
 		$this->currentToken ++;
+		return $this->getTokenAt($this->currentToken);
+	}
+
+
+	/**
+	 * Increment our index and return the new current token, skipping ones
+	 * that are not important
+	 *
+	 * @return array|null Null if no more tokens
+	 */
+	public function getPreviousImportantToken() {
+		$this->currentToken --;
+		$token = $this->getTokenAt($this->currentToken);
+
+		while (! is_null($token) && ! $this->isImportant($token)) {
+			$this->currentToken --;
+			$token = $this->getTokenAt($this->currentToken);
+		}
+
+		return $token;
+	}
+
+
+	/**
+	 * Move the current index backwards and get the previous token
+	 *
+	 * @return array|null Null if there isn't a token
+	 */
+	public function getPreviousToken() {
+		$this->currentToken --;
 		return $this->getTokenAt($this->currentToken);
 	}
 
@@ -334,6 +383,40 @@ class Tokenizer implements ArrayAccess, Iterator {
 	}
 
 
+	/**
+	 * Returns true if the current token is not one of the following:
+	 *
+	 * T_COMMENT
+	 * T_DOC_COMMENT
+	 * T_WHITESPACE
+	 *
+	 * @param array|null|mixed $token Token array, constant or null for current
+	 * @return boolean True if this token "counts" for processing
+	 */
+	public function isImportant($token = null) {
+		if (is_null($token)) {
+			$token = $this->tokens[$this->currentToken][0];
+		}
+
+		if (is_array($token)) {
+			$token = $token[0];
+		}
+
+		if ($token == T_COMMENT || $token == T_DOC_COMMENT || $token == T_WHITESPACE) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Returns true if the tokenizer class found no problems loading the file.
+	 * Keep in mind that this doesn't check very much right now.  This flag
+	 * does NOT mean the PHP is syntatically correct.
+	 *
+	 * @return boolean;
+	 */
 	public function isValid() {
 		return $this->isValid;
 	}
