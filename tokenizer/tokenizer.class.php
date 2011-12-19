@@ -111,6 +111,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 	protected $currentToken = 0;
 	protected $isValid = true;
+	protected $filename = null;
 	protected $tokens = array();
 	static protected $unknownTokenName = null;
 
@@ -171,6 +172,16 @@ class Tokenizer implements ArrayAccess, Iterator {
 		}
 
 		return $indices;
+	}
+
+
+	/**
+	 * Returns the name of the file that was tokenized, if any
+	 *
+	 * @return null|string filename
+	 */
+	public function getFilename() {
+		return $this->filename;
 	}
 
 
@@ -619,6 +630,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	static public function tokenizeFile($filename) {
 		$contents = @file_get_contents($filename);
 		$tokenizer = static::tokenizeString($contents);
+		$tokenizer->filename = $filename;
 		return $tokenizer;
 	}
 
