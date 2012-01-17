@@ -64,19 +64,13 @@
  *   $di = new DependencyInjectionContainer();
  *   $di->arr = array();
  *   $di->arr[] = 'something';  // Does NOT get added to the array
+ *   $temp = $di->arr;  // Workaround by using a temporary variable
+ *   $temp[] = 'something';
+ *   $di->arr = $temp;
  */
 class DependencyInjectionContainer {
 	protected $values = array();  // Values in the container
 
-	/**
-	 * Sets a new value into the container
-	 *
-	 * @param string $id
-	 * @param mixed $value
-	 */
-	public function __set($id, $value) {
-		$this->values[$id] = $value;
-	}
 
 	/**
 	 * Gets a value from the container.  If the value is a function, we
@@ -99,6 +93,49 @@ class DependencyInjectionContainer {
 		return $return;
 	}
 	
+
+	/**
+	 * Returns true if the specified name is set in the container.  Behaves
+	 * the same as a regular isset().
+	 *
+	 *    $arr = array();
+	 *    $arr['NullValue'] = null;
+	 *    isset($arr['NullValue']);  // Returns FALSE
+	 *
+	 *    $di = new DependencyInjectionContainer();
+	 *    $di->NullValue = null;  // Actually sets the value
+	 *    isset($di->NullValue);  // Returns FALSE, just like the array
+	 *
+	 * @param string $id
+	 * @return boolean
+	 */
+	public function __isset($name) {
+		return isset($this->values[$name]);
+	}
+
+
+	/**
+	 * Sets a new value into the container
+	 *
+	 * @param string $id
+	 * @param mixed $value
+	 */
+	public function __set($id, $value) {
+		$this->values[$id] = $value;
+	}
+
+
+	/**
+	 * Removes the specified key from the container
+	 *
+	 * @param string $id
+	 */
+	public function __unset($id) {
+		if (array_key_exists($id, $this->values)) {
+			unset($this->values[$id]);
+		}
+	}
+
 
 	/**
 	 * Helper function to create closures that will initialize a static
