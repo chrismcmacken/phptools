@@ -111,6 +111,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 	protected $currentToken = 0;
 	protected $isValid = true;
+	protected $isValidReason = null;
 	protected $filename = null;
 	protected $tokens = array();
 	static protected $unknownTokenName = null;
@@ -122,9 +123,10 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @param array $tokens Token list from token_get_all()
 	 */
 	protected function __construct($tokens) {
-		$this->tokens = $this->standardizeTokens($tokens);
 		$this->currentToken = 0;
 		$this->isValid = true;
+		$this->isValidReason = null;
+		$this->tokens = $this->standardizeTokens($tokens);
 	}
 
 
@@ -426,10 +428,21 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * Keep in mind that this doesn't check very much right now.  This flag
 	 * does NOT mean the PHP is syntatically correct.
 	 *
-	 * @return boolean;
+	 * @return boolean
 	 */
 	public function isValid() {
 		return $this->isValid;
+	}
+
+
+	/**
+	 * Returns the first reason why the tokenizer thinks the code is not
+	 * valid.  If the code looks valid, this returns null.
+	 *
+	 * @return string|null
+	 */
+	public function isValidReason() {
+		return $this->isValidReason;
 	}
 
 
@@ -459,7 +472,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * Used by the ArrayAccess interface
 	 */
 	public function offsetGet($offset) {
-		if (isset($this->tokens[$offset])) {
+		if (array_key_exists($offset, $this->tokens)) {
 			return $this->tokens[$offset];
 		}
 
@@ -506,6 +519,20 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Sets the reason that the tokenizer believes the code is invalid.
+	 * Only keeps around the first reason.
+	 *
+	 * @param $string Reason
+	 */
+	protected function setReason($reason) {
+		$this->isValid = false;
+		if (is_null($this->isValidReason)) {
+			$this->isValidReason = $reason;
+		}
+	}
+
+
+	/**
 	 * Convert a list of tokens fromm token_get_all() into a list of
 	 * standardized tokens.  A description of a standardized token
 	 * is at the top of this class.
@@ -516,6 +543,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	protected function standardizeTokens($tokens) {
 		$lastLineNumber = 1;
 		$matchStack = array();
+		$matchStackPhp = array();
 		$backtickIsLeft = true;
 
 		foreach ($tokens as $key => $token) {
@@ -560,17 +588,32 @@ class Tokenizer implements ArrayAccess, Iterator {
 			};
 
 			switch ($token[0]) {
+				case T_OPEN_TAG:
+				case T_OPEN_TAG_WITH_ECHO:
+					$tokens[$key][3] = false;
+					$matchStackPhp[] = $key;
+					break;
+
+				case T_CLOSE_TAG:
+					if ($this->isValid) {
+						if (! count($matchStackPhp)) {
+							$tokens[$key][3] = false;
+							$this->setReason('Trying to match ' . $this->tokenToString($token) . ' with nothing');
+						} else {
+							array_pop($matchStackPhp);
+							$tokens[$key][3] = $match[1];
+							$tokens[$match[1]][3] = $key;
+						}
+					} else {
+						$tokens[$key][3] = false;
+					}
+					break;
+
 				case T_CURLY_OPEN:
 				case T_DOLLAR_OPEN_CURLY_BRACES:
 				case T_TOKENIZER_BRACE_LEFT:
 					$tokens[$key][3] = false;
 					$matchStack[] = array(T_TOKENIZER_BRACE_RIGHT, $key);
-					break;
-
-				case T_OPEN_TAG:
-				case T_OPEN_TAG_WITH_ECHO:
-					$tokens[$key][3] = false;
-					$matchStack[] = array(T_CLOSE_TAG, $key);
 					break;
 
 				case T_TOKENIZER_BACKTICK_LEFT:
@@ -588,7 +631,6 @@ class Tokenizer implements ArrayAccess, Iterator {
 					$matchStack[] = array(T_TOKENIZER_PAREN_RIGHT, $key);
 					break;
 
-				case T_CLOSE_TAG:
 				case T_TOKENIZER_BACKTICK_RIGHT:
 				case T_TOKENIZER_BRACE_RIGHT:
 				case T_TOKENIZER_BRACKET_RIGHT:
@@ -597,7 +639,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 						$match = array_pop($matchStack);
 						if ($token[0] != $match[0]) {
 							$tokens[$key][3] = false;
-							$this->isValid = false;
+							$this->setReason('Trying to match ' . $this->tokenToString($token) . ' with ' . $this->tokenToString($tokens[$match[1]]));
 						} else {
 							$tokens[$key][3] = $match[1];
 							$tokens[$match[1]][3] = $key;
@@ -608,13 +650,22 @@ class Tokenizer implements ArrayAccess, Iterator {
 					break;
 
 				case T_BAD_CHARACTER:
-					$this->isValid = false;
+					$this->setReason('T_BAD_CHARACTER encountered on line ' . $this->getLine($token));
 					break;
 
 				default:
 			}
 
 			$lastLineNumber = $token[2] + substr_count($token[1], PHP_EOL);
+		}
+
+		if (count($matchStack)) {
+			$this->setReason('Unmatched braces left on stack.  Last one was ' . $this->tokenToString($matchStack[0][1]));
+		}
+
+		// 1 open tag at the end is fine
+		if (count($matchStackPhp) > 1) {
+			$this->setReason('Two open PHP tags that were not closed');
 		}
 
 		return $tokens;
@@ -645,6 +696,19 @@ class Tokenizer implements ArrayAccess, Iterator {
 		$tokens = token_get_all($str);
 		$tokenizer = new Tokenizer($tokens);
 		return $tokenizer;
+	}
+
+
+	/**
+	 * Returns a token as a string
+	 *
+	 * @param array|integer Token or absolute offset
+	 * return string
+	 */
+	protected function tokenToString($token) {
+		$str = $this->getName($token);
+		$str .= ' on line ' . $this->getLine($token);
+		return $str;
 	}
 
 
