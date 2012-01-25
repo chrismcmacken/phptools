@@ -600,9 +600,9 @@ class Tokenizer implements ArrayAccess, Iterator {
 							$tokens[$key][3] = false;
 							$this->setReason('Trying to match ' . $this->tokenToString($token) . ' with nothing');
 						} else {
-							array_pop($matchStackPhp);
-							$tokens[$key][3] = $match[1];
-							$tokens[$match[1]][3] = $key;
+							$match = array_pop($matchStackPhp);
+							$tokens[$key][3] = $match;
+							$tokens[$match][3] = $key;
 						}
 					} else {
 						$tokens[$key][3] = false;
