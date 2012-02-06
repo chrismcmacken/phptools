@@ -117,7 +117,7 @@ class WebRequest {
 	 * Return a single file's information or all uploaded file information
 	 *
 	 * @param string $name optional
-	 * @return string|array
+	 * @return array
 	 */
 	public function file($name = null) {
 		if (is_null($name)) {
@@ -128,7 +128,7 @@ class WebRequest {
 			return $this->file[$name];
 		}
 
-		return $default;
+		return null;
 	}
 
 	/**
