@@ -37,7 +37,7 @@
 /**
  * A Log class to aid in debugging and event tracking.
  */
-class Log {
+class Log2 {
 
 
 	/**
