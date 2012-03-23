@@ -9,7 +9,7 @@ spl_autoload_register(function ($name) {
 		'dependencyinjectioncontainer',
 		'dump',
 		'friend',
-		'log',
+		'log2',
 		'session2',
 		'tokenizer',
 		'webrequest',
