@@ -76,6 +76,11 @@ class Log {
 	 * @param $message
 	 */
 	public static function debug($message) {
+		//if we're not debugging or in dev, don't log these messages
+		if(false == static::$debug) {
+			return;
+		}
+
 		$backTrace = debug_backtrace(true);
 
 		static::writeLog(static::DEBUG, $message, $backTrace);
@@ -154,7 +159,7 @@ class Log {
 	 * @static
 	 * @param bool $value
 	 */
-	public static function setDebug(boolean $value) {
+	public static function setDebug($value) {
 		static::$debug = $value;
 	}
 
@@ -193,16 +198,16 @@ class Log {
 
 		$data = array(
 			'type' => $type,
-			'fileName' => $_SERVER['SCRIPT_NAME'],
+			'scriptName' => $_SERVER['SCRIPT_NAME'],
 			'uri' => $_SERVER['REQUEST_URI'],
 			'message' => $message,
-			'host' => $_SERVER['SERVER_NAME'],
-			'source' => $source,
-			'created' => time(),
+			'serverHost' => $_SERVER['SERVER_NAME'],
+			'logSource' => $source,
+			'logCreated' => time(),
 		);
 
 		if(null !== $detail) {
-			$data['detail'] = Dump::out($detail)->returned();
+			$data['messageDetail'] = Dump::out($detail)->returned();
 		}
 
 		$result = $db->insert('log', $data);
