@@ -69,7 +69,14 @@ class DB_Sqlite_Result extends DB_Result {
 	 */
 	protected function fetchRowAssocDb() {
 		$row = sqlite_fetch_array($this->resource, SQLITE_ASSOC);
-		return $row;
+		$out = array();
+		foreach ($row as $k => $v) {
+			if (substr($k, 0, 1) == '"' && substr($k, -1) == '"') {
+				$k = substr($k, 1, -1);
+			}
+			$out[$k] = $v;
+		}
+		return $out;
 	}
 
 
