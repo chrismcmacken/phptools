@@ -178,6 +178,36 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Gets the constant value for a given token.
+	 *
+	 * @param array $token
+	 * @return value that matches a T_* constant
+	 */
+	public function getConstant($token) {
+		if (! array_key_exists(0, $token)) {
+			return null;
+		}
+
+		return $token[0];
+	}
+
+
+	/**
+	 * Gets the content for a given token.
+	 *
+	 * @param array $token
+	 * @return value Content of the token
+	 */
+	public function getContent($token) {
+		if (! array_key_exists(1, $token)) {
+			return null;
+		}
+
+		return $token[1];
+	}
+
+
+	/**
 	 * Returns the name of the file that was tokenized, if any
 	 *
 	 * @return null|string filename
@@ -693,7 +723,11 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @return Tokenizer
 	 */
 	static public function tokenizeString($str) {
-		$tokens = token_get_all($str);
+		/* PHP sometimes warns with "Unexpected character in input"
+		 * when tokenizing a file, especially when accidentally
+		 * tokenizing images.
+		 */
+		$tokens = @token_get_all($str);
 		$tokenizer = new Tokenizer($tokens);
 		return $tokenizer;
 	}
