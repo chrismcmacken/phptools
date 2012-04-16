@@ -87,10 +87,10 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 
 		foreach ($tokenizer as $key => $token) {
 			$line = array(
-				$tokenizer->getName($token),
-				$tokenizer->getLine($token),
+				$token->name,
+				$token->line,
 			);
-			$match = $tokenizer->getMatch($token);
+			$match = $token->match;
 
 			if (! is_null($match)) {
 				if ($match === false) {
