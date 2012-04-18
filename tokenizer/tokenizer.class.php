@@ -1,7 +1,7 @@
 <?php
 
 /*
- Copyright (c) 2011 individual committers of the code
+ Copyright (c) 2012 individual committers of the code
  
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
@@ -50,6 +50,7 @@
  * prefer to call isset() instead of $this->valid().
  */
 
+require_once(__DIR__ . '/tokenizermatchstack.class.php');
 require_once(__DIR__ . '/tokenizertoken.class.php');
 
 class Tokenizer implements ArrayAccess, Iterator {
@@ -443,8 +444,8 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 */
 	protected function standardizeTokens($tokens) {
 		$lastToken = null;
-		$matchStack = array();
-		$matchStackPhp = array();
+		$matchStack = new TokenizerMatchStack();
+		$matchStackPhp = new TokenizerMatchStack();
 		TokenizerToken::reset();
 		$tokenObjects = array();
 		$matchables = array(
@@ -474,19 +475,13 @@ class Tokenizer implements ArrayAccess, Iterator {
 				switch ($tokenType) {
 					case T_OPEN_TAG:
 					case T_OPEN_TAG_WITH_ECHO:
-						$token->setMatch(false);
-						$matchStackPhp[] = array($key, $token);
+						$matchStackPhp->push($key, $token);
 						break;
 
 					case T_CLOSE_TAG:
 						if ($this->isValid) {
-							if (! count($matchStackPhp)) {
-								$token->setMatch(false);
+							if (! $matchStackPhp->popAndMatch($key, $token)) {
 								$this->setReason('Trying to match ' . $token . ' with nothing');
-							} else {
-								$match = array_pop($matchStackPhp);
-								$token->setMatch($match[0]);
-								$match[1]->setMatch($key);
 							}
 						} else {
 							$token->setMatch(false);
@@ -496,23 +491,19 @@ class Tokenizer implements ArrayAccess, Iterator {
 					case T_CURLY_OPEN:
 					case T_DOLLAR_OPEN_CURLY_BRACES:
 					case T_TOKENIZER_BRACE_LEFT:
-						$token->setMatch(false);
-						$matchStack[] = array(T_TOKENIZER_BRACE_RIGHT, $key, $token);
+						$matchStack->push($key, $token, T_TOKENIZER_BRACE_RIGHT);
 						break;
 
 					case T_TOKENIZER_BACKTICK_LEFT:
-						$token->setMatch(false);
-						$matchStack[] = array(T_TOKENIZER_BACKTICK_RIGHT, $key, $token);
+						$matchStack->push($key, $token, T_TOKENIZER_BACKTICK_RIGHT);
 						break;
 
 					case T_TOKENIZER_BRACKET_LEFT:
-						$token->setMatch(false);
-						$matchStack[] = array(T_TOKENIZER_BRACKET_RIGHT, $key, $token);
+						$matchStack->push($key, $token, T_TOKENIZER_BRACKET_RIGHT);
 						break;
 
 					case T_TOKENIZER_PAREN_LEFT:
-						$token->setMatch(false);
-						$matchStack[] = array(T_TOKENIZER_PAREN_RIGHT, $key, $token);
+						$matchStack->push($key, $token, T_TOKENIZER_PAREN_RIGHT);
 						break;
 
 					case T_TOKENIZER_BACKTICK_RIGHT:
@@ -520,14 +511,11 @@ class Tokenizer implements ArrayAccess, Iterator {
 					case T_TOKENIZER_BRACKET_RIGHT:
 					case T_TOKENIZER_PAREN_RIGHT:
 						if ($this->isValid) {
-							$match = array_pop($matchStack);
-
-							if ($tokenType != $match[0]) {
+							if (! $matchStack->canMatch($tokenType)) {
 								$token->setMatch(false);
-								$this->setReason('Trying to match ' . $token . ' with ' . $match[2]);
-							} else {
-								$token->setMatch($match[1]);
-								$match[2]->setMatch($key);
+								$this->setReason('Trying to match ' . $token . ' with ' . $matchStack->getToken());
+							} elseif (! $matchStack->popAndMatch($key, $token)) {
+								$this->setReason('Trying to match ' . $token . ' with nothing');
 							}
 						} else {
 							$token->setMatch(false);
@@ -543,12 +531,12 @@ class Tokenizer implements ArrayAccess, Iterator {
 			}
 		}
 
-		if (count($matchStack)) {
+		if ($this->isValid && $matchStack->length()) {
 			$this->setReason('Unmatched braces left on stack.  Last one was ' . $matchStack[0][2]);
 		}
 
 		// 1 open tag at the end is fine
-		if (count($matchStackPhp) > 1) {
+		if ($matchStackPhp->length() > 1) {
 			$this->setReason('Two open PHP tags that were not closed');
 		}
 
