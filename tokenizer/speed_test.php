@@ -76,6 +76,13 @@ function testTokenize() {
 }
 
 
+if (! file_exists('big_file.php')) {
+	echo "Sorry, but you need to find or make a really big PHP file for\n";
+	echo "the tokenization tests.  Name it \"big_file.php\" and then run\n";
+	echo "this speed test program again.\n";
+	exit();
+}
+
 $tests = array(
 	array(
 		'longOption' => 'tokenize',
