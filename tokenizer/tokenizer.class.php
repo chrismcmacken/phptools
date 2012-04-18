@@ -63,6 +63,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	protected $isValidReason = null;
 	protected $filename = null;
 	protected $tokens = array();
+	protected $tokensByType = null;
 
 
 	/**
@@ -101,14 +102,31 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @return array Indices of where that token was found
 	 */
 	public function findTokens($tokenList, $callback = null) {
-		$tokenList = (array) $tokenList;
+		if (is_null($this->tokensByType)) {
+			$tokensByType = array();
+			
+			foreach ($this->tokens as $k => $v) {
+				$type = $v->getType();
+
+				if (empty($tokensByType[$type])) {
+					$tokensByType[$type] = array($k);
+				} else {
+					$tokensByType[$type][] = $k;
+				}
+			}
+
+			$this->tokensByType = $tokensByType;
+		}
+
 		$indices = array();
 
-		foreach ($this->tokens as $k => $v) {
-			if (in_array($v->type, $tokenList)) {
-				$indices[] = $k;
+		foreach ((array) $tokenList as $type) {
+			if (! empty($this->tokensByType[$type])) {
+				$indices = array_merge($indices, $this->tokensByType[$type]);
 			}
 		}
+
+		sort($indices);
 
 		if (! is_null($callback)) {
 			$oldPosition = $this->currentToken;
@@ -416,8 +434,9 @@ class Tokenizer implements ArrayAccess, Iterator {
 			$token = TokenizerToken::create($token, $lastToken);
 			$tokenObjects[] = $token;
 			$lastToken = $token;
+			$tokenType = $token->type;
 
-			switch ($token->type) {
+			switch ($tokenType) {
 				case T_OPEN_TAG:
 				case T_OPEN_TAG_WITH_ECHO:
 					$token->setMatch(false);
@@ -428,7 +447,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 					if ($this->isValid) {
 						if (! count($matchStackPhp)) {
 							$token->setMatch(false);
-							$this->setReason('Trying to match ' . $this->tokenToString($token) . ' with nothing');
+							$this->setReason('Trying to match ' . $token . ' with nothing');
 						} else {
 							$match = array_pop($matchStackPhp);
 							$token->setMatch($match[0]);
@@ -467,7 +486,8 @@ class Tokenizer implements ArrayAccess, Iterator {
 				case T_TOKENIZER_PAREN_RIGHT:
 					if ($this->isValid) {
 						$match = array_pop($matchStack);
-						if ($token->type != $match[0]) {
+
+						if ($tokenType != $match[0]) {
 							$token->setMatch(false);
 							$this->setReason('Trying to match ' . $token . ' with ' . $match[2]);
 						} else {

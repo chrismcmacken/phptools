@@ -216,6 +216,11 @@ class TokenizerToken {
 		return $name;
 	}
 
+
+	public function getType() {
+		return $this->type;
+	}
+
 	
 	/**
 	 * Set up constants
