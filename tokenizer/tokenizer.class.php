@@ -445,7 +445,6 @@ class Tokenizer implements ArrayAccess, Iterator {
 		$lastToken = null;
 		$matchStack = array();
 		$matchStackPhp = array();
-		$backtickIsLeft = true;
 		TokenizerToken::reset();
 		$tokenObjects = array();
 		$matchables = array(
