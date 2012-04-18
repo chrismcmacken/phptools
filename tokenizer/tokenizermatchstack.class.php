@@ -41,13 +41,16 @@
 class TokenizerMatchStack {
 	protected $stack = array();
 
-	public function canMatch($type) {
+	public function canMatch($token) {
 		if (count($this->stack)) {
 			$last = end($this->stack);
 			
-			return $type == $last[2]; 
+			if ($token->getType() == $last[2]) {
+				return true;
+			}
 		}
 
+		$token->setMatch(false);
 		return false;
 	}
 

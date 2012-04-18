@@ -339,6 +339,116 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Match open backticks
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchBacktickOpen($key, $token, $stack, $phpStack) {
+		$stack->push($key, $token, T_TOKENIZER_BACKTICK_RIGHT);
+	}
+
+
+	/**
+	 * Match open brackets
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchBracketOpen($key, $token, $stack, $phpStack) {
+		$stack->push($key, $token, T_TOKENIZER_BRACKET_RIGHT);
+	}
+
+
+	/**
+	 * Match open braces
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchCurlyOpen($key, $token, $stack, $phpStack) {
+		$stack->push($key, $token, T_TOKENIZER_BRACE_RIGHT);
+	}
+
+
+	/**
+	 * Match most closing tags except closing PHP tags
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchGenericClose($key, $token, $stack, $phpStack) {
+		if (! $stack->canMatch($token)) {
+			$this->setReason('Trying to match ' . $token . ' with ' . $stack->getToken());
+		} elseif (! $stack->popAndMatch($key, $token)) {
+			$this->setReason('Trying to match ' . $token . ' with nothing');
+		}
+	}
+
+
+	/**
+	 * Flag the file as invalid when an invalid token is found
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchInvalid($key, $token, $stack, $phpStack) {
+		$this->setReason('T_BAD_CHARACTER encountered on line ' . $token->line);
+	}
+
+
+	/**
+	 * Match open parenthesis
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchParenOpen($key, $token, $stack, $phpStack) {
+		$stack->push($key, $token, T_TOKENIZER_PAREN_RIGHT);
+	}
+
+
+	/**
+	 * Match PHP close tags
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchPhpClose($key, $token, $stack, $phpStack) {
+		if (! $phpStack->popAndMatch($key, $token)) {
+			$this->setReason('Trying to match ' . $token . ' with nothing');
+		}
+	}
+
+
+	/**
+	 * Match PHP open tags
+	 *
+	 * @param integer $key
+	 * @param TokenizerToken $token
+	 * @param TokenizerMatchStack $stack
+	 * @param TokenizerMatchStack $phpStack
+	 */
+	protected function matchPhpOpen($key, $token, $stack, $phpStack) {
+		$phpStack->push($key, $token);
+	}
+
+
+	/**
 	 * Move to the next token in the list
 	 *
 	 * Used by the Iterator interface
@@ -428,6 +538,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 */
 	protected function setReason($reason) {
 		$this->isValid = false;
+
 		if (is_null($this->isValidReason)) {
 			$this->isValidReason = $reason;
 		}
@@ -443,95 +554,45 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @return array Standardized list of tokens
 	 */
 	protected function standardizeTokens($tokens) {
-		$lastToken = null;
+		$token = null;
 		$matchStack = new TokenizerMatchStack();
 		$matchStackPhp = new TokenizerMatchStack();
 		TokenizerToken::reset();
 		$tokenObjects = array();
 		$matchables = array(
-			T_OPEN_TAG,
-			T_OPEN_TAG_WITH_ECHO,
-			T_CLOSE_TAG,
-			T_CURLY_OPEN,
-			T_DOLLAR_OPEN_CURLY_BRACES,
-			T_TOKENIZER_BRACE_LEFT,
-			T_TOKENIZER_BACKTICK_LEFT,
-			T_TOKENIZER_BRACKET_LEFT,
-			T_TOKENIZER_PAREN_LEFT,
-			T_TOKENIZER_BACKTICK_RIGHT,
-			T_TOKENIZER_BRACE_RIGHT,
-			T_TOKENIZER_BRACKET_RIGHT,
-			T_TOKENIZER_PAREN_RIGHT,
-			T_BAD_CHARACTER,
+			T_OPEN_TAG => 'matchPhpOpen',
+			T_OPEN_TAG_WITH_ECHO => 'matchPhpOpen',
+			T_CLOSE_TAG => 'matchPhpClose',
+			T_CURLY_OPEN => 'matchCurlyOpen',
+			T_DOLLAR_OPEN_CURLY_BRACES => 'matchCurlyOpen',
+			T_TOKENIZER_BRACE_LEFT => 'matchCurlyOpen',
+			T_TOKENIZER_BACKTICK_LEFT => 'matchBacktickOpen',
+			T_TOKENIZER_BRACKET_LEFT => 'matchBracketOpen',
+			T_TOKENIZER_PAREN_LEFT => 'matchParenOpen',
+			T_TOKENIZER_BACKTICK_RIGHT => 'matchGenericClose',
+			T_TOKENIZER_BRACE_RIGHT => 'matchGenericClose',
+			T_TOKENIZER_BRACKET_RIGHT => 'matchGenericClose',
+			T_TOKENIZER_PAREN_RIGHT => 'matchGenericClose',
+			T_BAD_CHARACTER => 'matchInvalid',
 		);
 
-		foreach ($tokens as $key => $token) {
-			$token = TokenizerToken::create($token, $lastToken);
+		foreach ($tokens as $key => $tokenArray) {
+			// Pass in the previous token for line number calculation
+			$token = TokenizerToken::create($tokenArray, $token);
 			$tokenObjects[] = $token;
-			$lastToken = $token;
-			$tokenType = $token->type;
+			$tokenType = $token->getType();
 
-			if (in_array($tokenType, $matchables)) {
-				switch ($tokenType) {
-					case T_OPEN_TAG:
-					case T_OPEN_TAG_WITH_ECHO:
-						$matchStackPhp->push($key, $token);
-						break;
-
-					case T_CLOSE_TAG:
-						if ($this->isValid) {
-							if (! $matchStackPhp->popAndMatch($key, $token)) {
-								$this->setReason('Trying to match ' . $token . ' with nothing');
-							}
-						} else {
-							$token->setMatch(false);
-						}
-						break;
-
-					case T_CURLY_OPEN:
-					case T_DOLLAR_OPEN_CURLY_BRACES:
-					case T_TOKENIZER_BRACE_LEFT:
-						$matchStack->push($key, $token, T_TOKENIZER_BRACE_RIGHT);
-						break;
-
-					case T_TOKENIZER_BACKTICK_LEFT:
-						$matchStack->push($key, $token, T_TOKENIZER_BACKTICK_RIGHT);
-						break;
-
-					case T_TOKENIZER_BRACKET_LEFT:
-						$matchStack->push($key, $token, T_TOKENIZER_BRACKET_RIGHT);
-						break;
-
-					case T_TOKENIZER_PAREN_LEFT:
-						$matchStack->push($key, $token, T_TOKENIZER_PAREN_RIGHT);
-						break;
-
-					case T_TOKENIZER_BACKTICK_RIGHT:
-					case T_TOKENIZER_BRACE_RIGHT:
-					case T_TOKENIZER_BRACKET_RIGHT:
-					case T_TOKENIZER_PAREN_RIGHT:
-						if ($this->isValid) {
-							if (! $matchStack->canMatch($tokenType)) {
-								$token->setMatch(false);
-								$this->setReason('Trying to match ' . $token . ' with ' . $matchStack->getToken());
-							} elseif (! $matchStack->popAndMatch($key, $token)) {
-								$this->setReason('Trying to match ' . $token . ' with nothing');
-							}
-						} else {
-							$token->setMatch(false);
-						}
-						break;
-
-					case T_BAD_CHARACTER:
-						$this->setReason('T_BAD_CHARACTER encountered on line ' . $token->line);
-						break;
-
-					default:
+			if (! empty($matchables[$tokenType])) {
+				if ($this->isValid) {
+					$func = $matchables[$tokenType];
+					$this->$func($key, $token, $matchStack, $matchStackPhp);
+				} else {
+					$token->setMatch(false);
 				}
 			}
 		}
 
-		if ($this->isValid && $matchStack->length()) {
+		if ($matchStack->length()) {
 			$this->setReason('Unmatched braces left on stack.  Last one was ' . $matchStack[0][2]);
 		}
 
