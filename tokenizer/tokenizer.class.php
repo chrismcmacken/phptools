@@ -94,6 +94,32 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
+	 * Create an index of the tokens by type.  Calling this method will
+	 * significantly speed up calls to findTokens().  If you plan on
+	 * using findTokens() only once, then this call will waste a little
+	 * bit of speed but it shouldn't be too noticeable.
+	 */
+	public function indexTokenTypes() {
+		if (! is_null($this->tokensByType)) {
+			return;
+		}
+
+		$tokensByType = array();
+		
+		foreach ($this->tokens as $k => $v) {
+			$type = $v->getType();
+
+			if (empty($tokensByType[$type])) {
+				$tokensByType[$type] = array($k);
+			} else {
+				$tokensByType[$type][] = $k;
+			}
+		}
+
+		$this->tokensByType = $tokensByType;
+	}
+
+	/**
 	 * Finds instances of tokens, calling the callback with a Tokenizer
 	 * object initialized to that position.
 	 *
@@ -102,31 +128,24 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @return array Indices of where that token was found
 	 */
 	public function findTokens($tokenList, $callback = null) {
-		if (is_null($this->tokensByType)) {
-			$tokensByType = array();
-			
-			foreach ($this->tokens as $k => $v) {
-				$type = $v->getType();
+		$tokenList = (array) $tokenList;
+		$indices = array();
 
-				if (empty($tokensByType[$type])) {
-					$tokensByType[$type] = array($k);
-				} else {
-					$tokensByType[$type][] = $k;
+		if (is_null($this->tokensByType)) {
+			foreach ($this->tokens as $k => $v) {
+				if (in_array($v->getType(), $tokenList)) {
+					$indices[] = $k;
+				}
+			}
+		} else {
+			foreach ($tokenList as $type) {
+				if (! empty($this->tokensByType[$type])) {
+					$indices = array_merge($indices, $this->tokensByType[$type]);
 				}
 			}
 
-			$this->tokensByType = $tokensByType;
+			sort($indices);
 		}
-
-		$indices = array();
-
-		foreach ((array) $tokenList as $type) {
-			if (! empty($this->tokensByType[$type])) {
-				$indices = array_merge($indices, $this->tokensByType[$type]);
-			}
-		}
-
-		sort($indices);
 
 		if (! is_null($callback)) {
 			$oldPosition = $this->currentToken;
@@ -429,6 +448,22 @@ class Tokenizer implements ArrayAccess, Iterator {
 		$backtickIsLeft = true;
 		TokenizerToken::reset();
 		$tokenObjects = array();
+		$matchables = array(
+			T_OPEN_TAG,
+			T_OPEN_TAG_WITH_ECHO,
+			T_CLOSE_TAG,
+			T_CURLY_OPEN,
+			T_DOLLAR_OPEN_CURLY_BRACES,
+			T_TOKENIZER_BRACE_LEFT,
+			T_TOKENIZER_BACKTICK_LEFT,
+			T_TOKENIZER_BRACKET_LEFT,
+			T_TOKENIZER_PAREN_LEFT,
+			T_TOKENIZER_BACKTICK_RIGHT,
+			T_TOKENIZER_BRACE_RIGHT,
+			T_TOKENIZER_BRACKET_RIGHT,
+			T_TOKENIZER_PAREN_RIGHT,
+			T_BAD_CHARACTER,
+		);
 
 		foreach ($tokens as $key => $token) {
 			$token = TokenizerToken::create($token, $lastToken);
@@ -436,74 +471,76 @@ class Tokenizer implements ArrayAccess, Iterator {
 			$lastToken = $token;
 			$tokenType = $token->type;
 
-			switch ($tokenType) {
-				case T_OPEN_TAG:
-				case T_OPEN_TAG_WITH_ECHO:
-					$token->setMatch(false);
-					$matchStackPhp[] = array($key, $token);
-					break;
-
-				case T_CLOSE_TAG:
-					if ($this->isValid) {
-						if (! count($matchStackPhp)) {
-							$token->setMatch(false);
-							$this->setReason('Trying to match ' . $token . ' with nothing');
-						} else {
-							$match = array_pop($matchStackPhp);
-							$token->setMatch($match[0]);
-							$match[1]->setMatch($key);
-						}
-					} else {
+			if (in_array($tokenType, $matchables)) {
+				switch ($tokenType) {
+					case T_OPEN_TAG:
+					case T_OPEN_TAG_WITH_ECHO:
 						$token->setMatch(false);
-					}
-					break;
+						$matchStackPhp[] = array($key, $token);
+						break;
 
-				case T_CURLY_OPEN:
-				case T_DOLLAR_OPEN_CURLY_BRACES:
-				case T_TOKENIZER_BRACE_LEFT:
-					$token->setMatch(false);
-					$matchStack[] = array(T_TOKENIZER_BRACE_RIGHT, $key, $token);
-					break;
-
-				case T_TOKENIZER_BACKTICK_LEFT:
-					$token->setMatch(false);
-					$matchStack[] = array(T_TOKENIZER_BACKTICK_RIGHT, $key, $token);
-					break;
-
-				case T_TOKENIZER_BRACKET_LEFT:
-					$token->setMatch(false);
-					$matchStack[] = array(T_TOKENIZER_BRACKET_RIGHT, $key, $token);
-					break;
-
-				case T_TOKENIZER_PAREN_LEFT:
-					$token->setMatch(false);
-					$matchStack[] = array(T_TOKENIZER_PAREN_RIGHT, $key, $token);
-					break;
-
-				case T_TOKENIZER_BACKTICK_RIGHT:
-				case T_TOKENIZER_BRACE_RIGHT:
-				case T_TOKENIZER_BRACKET_RIGHT:
-				case T_TOKENIZER_PAREN_RIGHT:
-					if ($this->isValid) {
-						$match = array_pop($matchStack);
-
-						if ($tokenType != $match[0]) {
-							$token->setMatch(false);
-							$this->setReason('Trying to match ' . $token . ' with ' . $match[2]);
+					case T_CLOSE_TAG:
+						if ($this->isValid) {
+							if (! count($matchStackPhp)) {
+								$token->setMatch(false);
+								$this->setReason('Trying to match ' . $token . ' with nothing');
+							} else {
+								$match = array_pop($matchStackPhp);
+								$token->setMatch($match[0]);
+								$match[1]->setMatch($key);
+							}
 						} else {
-							$token->setMatch($match[1]);
-							$match[2]->setMatch($key);
+							$token->setMatch(false);
 						}
-					} else {
+						break;
+
+					case T_CURLY_OPEN:
+					case T_DOLLAR_OPEN_CURLY_BRACES:
+					case T_TOKENIZER_BRACE_LEFT:
 						$token->setMatch(false);
-					}
-					break;
+						$matchStack[] = array(T_TOKENIZER_BRACE_RIGHT, $key, $token);
+						break;
 
-				case T_BAD_CHARACTER:
-					$this->setReason('T_BAD_CHARACTER encountered on line ' . $token->line);
-					break;
+					case T_TOKENIZER_BACKTICK_LEFT:
+						$token->setMatch(false);
+						$matchStack[] = array(T_TOKENIZER_BACKTICK_RIGHT, $key, $token);
+						break;
 
-				default:
+					case T_TOKENIZER_BRACKET_LEFT:
+						$token->setMatch(false);
+						$matchStack[] = array(T_TOKENIZER_BRACKET_RIGHT, $key, $token);
+						break;
+
+					case T_TOKENIZER_PAREN_LEFT:
+						$token->setMatch(false);
+						$matchStack[] = array(T_TOKENIZER_PAREN_RIGHT, $key, $token);
+						break;
+
+					case T_TOKENIZER_BACKTICK_RIGHT:
+					case T_TOKENIZER_BRACE_RIGHT:
+					case T_TOKENIZER_BRACKET_RIGHT:
+					case T_TOKENIZER_PAREN_RIGHT:
+						if ($this->isValid) {
+							$match = array_pop($matchStack);
+
+							if ($tokenType != $match[0]) {
+								$token->setMatch(false);
+								$this->setReason('Trying to match ' . $token . ' with ' . $match[2]);
+							} else {
+								$token->setMatch($match[1]);
+								$match[2]->setMatch($key);
+							}
+						} else {
+							$token->setMatch(false);
+						}
+						break;
+
+					case T_BAD_CHARACTER:
+						$this->setReason('T_BAD_CHARACTER encountered on line ' . $token->line);
+						break;
+
+					default:
+				}
 			}
 		}
 
