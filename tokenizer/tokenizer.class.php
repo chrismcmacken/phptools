@@ -95,32 +95,6 @@ class Tokenizer implements ArrayAccess, Iterator {
 
 
 	/**
-	 * Create an index of the tokens by type.  Calling this method will
-	 * significantly speed up calls to findTokens().  If you plan on
-	 * using findTokens() only once, then this call will waste a little
-	 * bit of speed but it shouldn't be too noticeable.
-	 */
-	public function indexTokenTypes() {
-		if (! is_null($this->tokensByType)) {
-			return;
-		}
-
-		$tokensByType = array();
-		
-		foreach ($this->tokens as $k => $v) {
-			$type = $v->getType();
-
-			if (empty($tokensByType[$type])) {
-				$tokensByType[$type] = array($k);
-			} else {
-				$tokensByType[$type][] = $k;
-			}
-		}
-
-		$this->tokensByType = $tokensByType;
-	}
-
-	/**
 	 * Finds instances of tokens, calling the callback with a Tokenizer
 	 * object initialized to that position.
 	 *
@@ -133,20 +107,28 @@ class Tokenizer implements ArrayAccess, Iterator {
 		$indices = array();
 
 		if (is_null($this->tokensByType)) {
+			$tokensByType = array();
+			
 			foreach ($this->tokens as $k => $v) {
-				if (in_array($v->getType(), $tokenList)) {
-					$indices[] = $k;
-				}
-			}
-		} else {
-			foreach ($tokenList as $type) {
-				if (! empty($this->tokensByType[$type])) {
-					$indices = array_merge($indices, $this->tokensByType[$type]);
+				$type = $v->getType();
+
+				if (empty($tokensByType[$type])) {
+					$tokensByType[$type] = array($k);
+				} else {
+					$tokensByType[$type][] = $k;
 				}
 			}
 
-			sort($indices);
+			$this->tokensByType = $tokensByType;
 		}
+		
+		foreach ($tokenList as $type) {
+			if (! empty($this->tokensByType[$type])) {
+				$indices = array_merge($indices, $this->tokensByType[$type]);
+			}
+		}
+
+		sort($indices);
 
 		if (! is_null($callback)) {
 			$oldPosition = $this->currentToken;
