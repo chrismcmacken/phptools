@@ -1,13 +1,13 @@
 # ************************************************************
 # Sequel Pro SQL dump
-# Version 3534
+# Version 3408
 #
 # http://www.sequelpro.com/
 # http://code.google.com/p/sequel-pro/
 #
 # Host: 127.0.0.1 (MySQL 5.5.12)
 # Database: SR4Tools
-# Generation Time: 2012-03-24 15:43:53 -0500
+# Generation Time: 2012-04-22 14:48:17 -0500
 # ************************************************************
 
 
@@ -20,12 +20,12 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-# Dump of table log
+# Dump of table logger
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `log`;
+DROP TABLE IF EXISTS `logger`;
 
-CREATE TABLE `log` (
+CREATE TABLE `logger` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `type` enum('ERROR','WARN','INFO','DEBUG') NOT NULL DEFAULT 'INFO',
   `scriptName` varchar(255) NOT NULL DEFAULT '',
