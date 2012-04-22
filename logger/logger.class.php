@@ -160,7 +160,7 @@ class Logger {
 	 * @param bool $value
 	 */
 	public static function setDebug($value) {
-		static::$debug = $value;
+		static::$debug = (bool)$value;
 	}
 
 
