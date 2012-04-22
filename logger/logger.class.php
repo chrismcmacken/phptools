@@ -206,8 +206,13 @@ class Logger {
 			'logCreated' => time(),
 		);
 
+		//if it's an object or an array make sure we dump it so we get everything output
+		if(is_object($detail) || is_array($detail)) {
+			$detail = Dump::out($detail)->returned();
+		}
+
 		if(null !== $detail) {
-			$data['messageDetail'] = Dump::out($detail)->returned();
+			$data['messageDetail'] = $detail;
 		}
 
 		$result = $db->insert('log', $data);
