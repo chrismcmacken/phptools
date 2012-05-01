@@ -151,6 +151,17 @@ class Logger {
 
 		static::$dbObjectCallback = $callback;
 	}
+	
+	
+	/**
+	 * Sets the table name that we will be logging messages to
+	 *
+	 * @param $tableName String The name of the table we will be logging to
+	 * @return void
+	 */
+	public static function setDbTableName($tableName) {
+		$this->tableName = $tableName;
+	}
 
 
 	/**
@@ -215,7 +226,7 @@ class Logger {
 			$data['messageDetail'] = $detail;
 		}
 
-		$result = $db->insert('log', $data);
+		$result = $db->insert($this->tableName, $data);
 
 		if(false == $result) {
 			trigger_error("Unable to write to the log table.", E_WARNING);
