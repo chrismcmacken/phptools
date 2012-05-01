@@ -52,6 +52,12 @@ class Logger {
 
 
 	/**
+	 * @var String The name of the table we will be logging to
+	 */
+	protected static $tableName;
+
+
+	/**
 	 * Used to indicate if we're in a dev / debug
 	 * environment
 	 *
@@ -160,7 +166,7 @@ class Logger {
 	 * @return void
 	 */
 	public static function setDbTableName($tableName) {
-		$this->tableName = $tableName;
+		static::$tableName = $tableName;
 	}
 
 
@@ -226,7 +232,7 @@ class Logger {
 			$data['messageDetail'] = $detail;
 		}
 
-		$result = $db->insert($this->tableName, $data);
+		$result = $db->insert(static::$tableName, $data);
 
 		if(false == $result) {
 			trigger_error("Unable to write to the log table.", E_WARNING);
