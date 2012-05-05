@@ -1,0 +1,35 @@
+{
+	"name": "chrismcmacken/phptools",
+	"type": "library",
+	"description": "Small utilities that assist in developing applications",
+	"keywords": [
+		"crypto",
+		"db",
+		"dependency",
+		"injection",
+		"container",
+		"dump",
+		"friend",
+		"logger",
+		"session",
+		"session2",
+		"tokenizer",
+		"webrequest"
+	],
+	"homepage": "http://fidian.com/",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Chris McMacken",
+			"email": "chris.mcmacken@gmail.com"
+		},
+		{
+			"name": "Tyler Akins",
+			"email": "fidian@rumkin.com",
+			"homepage": "http://rumkin.com/"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0"
+	}
+}
