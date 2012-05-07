@@ -220,7 +220,7 @@ class Logger {
 			'message' => $message,
 			'serverHost' => $_SERVER['SERVER_NAME'],
 			'logSource' => $source,
-			'logCreated' => time(),
+			'logCreated' => date("Y-m-d h:i:s"),
 		);
 
 		//if it's an object or an array make sure we dump it so we get everything output
