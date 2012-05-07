@@ -106,7 +106,7 @@ class DB_Mysql_Handle extends DB_Base {
 
 		$result = $this->query($sql);
 
-		if ($result->rows()) {
+		if ($result->count()) {
 			return true;
 		}
 
@@ -191,7 +191,7 @@ class DB_Mysql_Handle extends DB_Base {
 
 		$result = $this->query($sql);
 
-		if ($result->rows()) {
+		if ($result->count()) {
 			return true;
 		}
 
