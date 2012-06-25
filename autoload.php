@@ -12,6 +12,8 @@ spl_autoload_register(function ($name) {
 		'logger',
 		'session2',
 		'tokenizer',
+		'ultralite',
+		'variablestream',
 		'webrequest',
 	);
 
