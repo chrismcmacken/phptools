@@ -93,19 +93,19 @@ protected $variables = array();
 	// Take a template string and change it into PHP
 	protected function parse($str) {
 		$replacements = array(
-			'/^\s*@(.*)$/m' => '<?php \\1 ?' . '>',  // If placed later, removed spaces from the output of the next rule
-			'/{{\s*(.*)}}(\\n|\\r\\n?)/' => '<?php $this->output(isset($\\1)?$\\1:null) ?' . ">\\2\\2",
+			'/{{\s*(.*?)}}(\\n|\\r\\n?)?/' => '<?php $this->output($\\1) ?' . ">\\2\\2",
 			'/\[\[/' => '<?php ',
 			'/\]\]/' => ' ?' . '>',
+			'/^[ \t\f]*@(.*)$/m' => '<?php \\1 ?' . '>',  // If placed later, removed spaces from the output of the next rule
 		);
 		$php = preg_replace(array_keys($replacements), array_values($replacements), $str);
 		return $php;
 	}
 
 	// include another file -- use "@$this->inc('other.tpl')" in your template
-	protected function inc($template) {
+	protected function inc($template, $moreVars = array()) {
 		$class = get_class($this);
-		$engine = new $class($this->baseDir, $this->variables);
+		$engine = new $class($this->baseDir, array_merge($this->variables, $moreVars));
 		echo $engine->render($template);
 	}
 
@@ -117,6 +117,7 @@ protected $variables = array();
 		$php = $this->parse($contents);
 		set_error_handler(array($this, 'errorHandler'));
 		ob_start();
+		//fwrite(STDERR, "\n\n$template\n\n$php\n");
 		eval('?' . '>' . $php);
 		$result = ob_get_clean();
 		restore_error_handler();
