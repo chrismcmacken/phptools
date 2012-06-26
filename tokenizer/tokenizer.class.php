@@ -575,7 +575,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 		}
 
 		if ($matchStack->length()) {
-			$this->setReason('Unmatched braces left on stack.  Last one was ' . $matchStack[0][2]);
+			$this->setReason('Unmatched braces left on stack.  Last one was ' . $matchStack->getToken());
 		}
 
 		// 1 open tag at the end is fine
