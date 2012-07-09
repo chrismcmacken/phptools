@@ -349,4 +349,32 @@ class WebRequest {
 		// This method should not be passed to PHP
 		throw new ErrorException('Invalid method: ' + $this->method());
 	}
+
+
+	/**
+	 * Returns the URI for the current script
+	 *
+	 * @return string
+	 */
+	public function uri($queryString = true) {
+		$uri = null;
+
+		if (is_null($uri) && array_key_exists('REQUEST_URI', $_SERVER)) {
+			$uri = explode('?', $_SERVER['REQUEST_URI']);
+		}
+
+		if (is_null($uri)) {
+			$uri = array('/');
+
+			if (array_key_exists('QUERY_STRING', $_SERVER)) {
+				$uri[] = $_SERVER['QUERY_STRING'];
+			}
+		}
+
+		if (! $queryString) {
+			return $uri[0];
+		}
+
+		return implode('?', $uri);
+	}
 }
