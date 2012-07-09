@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2011 individual committers of the code
+ * Copyright (c) 2012 individual committers of the code
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@
  *
  * @throws ErrorException Unsafe file found
  * @throws ErrorException Form data isn't an array nor a string
+ * @throws ErrorException Invalid method
  */
 class WebRequest {
 	protected $cookies;
@@ -56,6 +57,7 @@ class WebRequest {
 	 * @param boolean $destroySuperglobals If true, erase them (default)
 	 * @throws ErrorException Unsafe file found
 	 * @throws ErrorException Form data isn't an array nor a string
+	 * @throws ErrorException Invalid method
 	 */
 	public function __construct($destroySuperglobals = true) {
 		$this->cookies = $_COOKIE ?: array();
@@ -92,6 +94,9 @@ class WebRequest {
 
 		// Ensure files are uploaded files
 		$this->files = $this->sanitizeFiles($this->files);
+
+		// Validate the method
+		$this->sanitizeMethod();
 	}
 
 	/**
@@ -322,5 +327,26 @@ class WebRequest {
 		}
 
 		return $out;
+	}
+
+
+	/**
+	 * PHP should only be called for some method types
+	 *
+	 * @throws ErrorException Invalid method
+	 */
+	public function sanitizeMethod() {
+		if (in_array(array(
+			'HEAD',
+			'GET',
+			'POST',
+			'PUT',
+			'DELETE'
+		), $this->method())) {
+			return;
+		}
+
+		// This method should not be passed to PHP
+		throw new ErrorException('Invalid method: ' + $this->method());
 	}
 }
