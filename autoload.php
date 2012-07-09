@@ -9,6 +9,7 @@ spl_autoload_register(function ($name) {
 		'dependencyinjectioncontainer',
 		'dump',
 		'friend',
+		'literoute',
 		'logger',
 		'session2',
 		'tokenizer',
