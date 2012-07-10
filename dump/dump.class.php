@@ -256,9 +256,9 @@ class Dump {
 		$lastType = null;
 		
 		foreach ($traversed as $entry) {
-			if ($lastType == 'object') {
+			if ($entry[0] == 'object') {
 				$out .= '->' . $entry[2];
-			} elseif ($lastType == 'array') {
+			} elseif ($entry[0] == 'array') {
 				$out .= '[' . $this->dumpAnything($entry[2], true) . ']';
 			} else {
 				$out .= $entry[2];
@@ -566,7 +566,7 @@ function dumpToggle(o) {
 		}
 
 		$data = $this->getObjectProperties($what);
-		return $this->helperObjectSetState(get_class($what), $data);
+		return $this->helperObjectSetState($what, get_class($what), $data);
 	}
 
 
@@ -576,17 +576,17 @@ function dumpToggle(o) {
 	 * @param string $className
 	 * @param array $what
 	 */
-	protected function helperObjectSetState($className, $what) {
+	protected function helperObjectSetState($what, $className, $data) {
 		static $varTypes = array(
 			'public',
 			'protected',
 			'private',
 		);
 		$this->span('object', $className . '::__set_state(array(');
-		$this->collapseStart(count($what), ! empty($what));
+		$this->collapseStart(count($data), ! empty($data));
 		$this->indent ++;
 		$isFirst = true;
-		foreach ($what as $k => $v) {
+		foreach ($data as $k => $v) {
 			if (! $isFirst) {
 				echo ',';
 			}
@@ -610,7 +610,7 @@ function dumpToggle(o) {
 			$this->popStack();
 		}
 		$this->indent --;
-		if (count($what)) {
+		if (count($data)) {
 			$this->newline();
 		}
 		$this->collapseEnd();
@@ -759,13 +759,13 @@ function dumpToggle(o) {
 		}
 
 		foreach ($this->nameStack as $entry) {
-			$traversed[] = $entry;
 			if ($entry[0] == $type) {
 				if ($entry[1] === $what) {
 					$this->dumpRecursive($traversed);
 					return true;
 				}
 			}
+			$traversed[] = $entry;
 		}
 
 		return false;
@@ -827,7 +827,7 @@ function dumpToggle(o) {
 			'specified' => $what->specified,
 			'value' => $what->value,
 		);
-		$this->helperObjectSetState(get_class($what), $s);
+		$this->helperObjectSetState($what, get_class($what), $s);
 	}
 
 
@@ -865,7 +865,7 @@ function dumpToggle(o) {
 			'tagName' => $what->tagName,
 			'textContent' => $what->textContent,
 		);
-		$this->helperObjectSetState(get_class($what), $s);
+		$this->helperObjectSetState($what, get_class($what), $s);
 	}
 
 
@@ -882,7 +882,7 @@ function dumpToggle(o) {
 			$s[$k] = $v;
 		}
 
-		$this->helperObjectSetState(get_class($what), $s);
+		$this->helperObjectSetState($what, get_class($what), $s);
 	}
 
 
@@ -904,7 +904,7 @@ function dumpToggle(o) {
 			'prefix' => $what->prefix,
 			'textContent' => $what->textContent,
 		);
-		$this->helperObjectSetState(get_class($what), $s);
+		$this->helperObjectSetState($what, get_class($what), $s);
 	}
 
 
@@ -918,7 +918,7 @@ function dumpToggle(o) {
 		$s = array(
 			'length' => $what->length,
 		);
-		$this->helperObjectSetState(get_class($what), $s);
+		$this->helperObjectSetState($what, get_class($what), $s);
 	}
 
 
