@@ -44,6 +44,7 @@ abstract class LiteRoute {
 	protected $request = null;  // WebRequest object
 	protected $parent = null;
 	protected $uri = '';  // Not the full URI, just the one for this component
+	protected $magicVariables = null;
 
 
 	/**
@@ -52,18 +53,48 @@ abstract class LiteRoute {
 	 * @param string $uri URI that's left for processing - you shouldn't need it
 	 * @param WebRequest $request Where one can get POST/GET/etc
 	 */
-	public function __construct($uri = null, $request = null, $parent = null) {
-		if (is_null($request)) {
-			$request = new WebRequest();
+	public function __construct($uri = null, $parent = null) {
+		if (is_null($parent)) {
+			$this->request = new WebRequest();
+			$this->magicVariables = new stdClass();
+		} else {
+			$this->parent = $parent;
+			$this->request = $parent->request;
+			$this->magicVariables = $parent->magicVariables;
 		}
 
+		// Do this second so $this->request is set
 		if (is_null($uri)) {
-			$uri = $request->uri(false);
+			$this->uri = $this->request->uri(false);
+		} else {
+			$this->uri = $uri;
 		}
+	}
 
-		$this->uri = $uri;
-		$this->request = $request;
-		$this->parent = null;
+
+	/**
+	 * Get a magic variable from a shared storage object
+	 *
+	 * @param string name
+	 * @return mixed Null if it is not yet set
+	 */
+	public function __get($name) {
+		if (property_exists($this->magicVariables, $name)) {
+			return $this->magicVariables->$name;
+		}
+		
+		return null;
+	}
+
+
+	/**
+	 * Set a magic variable into a shared storage object
+	 *
+	 * @param string name
+	 * @param mixed value
+	 */
+	public function __set($name, $value) {
+		$this->magicVariables->$name = $value;
 	}
 
 
@@ -105,7 +136,7 @@ abstract class LiteRoute {
 	 */
 	public function getController() {
 		if (! is_null($this->controller)) {
-			return $controller;
+			return $this->controller;
 		}
 
 		$component = $this->nextComponent();
@@ -116,7 +147,7 @@ abstract class LiteRoute {
 			if (is_string($target)) {
 				$uri = substr($this->uri, 1 + strlen($component));
 				$this->uri = '/' . $component;
-				$class = new $className($uri, $request, $this);
+				$class = new $target($uri, $this);
 				$this->controller = $class->getController();
 				return $this->controller;
 			}
@@ -148,9 +179,7 @@ abstract class LiteRoute {
 	 * @param string $target Next portion from the URI
 	 * @return string|null Class name of a child controller
 	 */
-	protected function map($target) {
-		throw new Exception('No map defined');
-	}
+	protected function map($target) {}
 
 
 	/**
@@ -199,8 +228,12 @@ abstract class LiteRoute {
 		// Make the link absolute
 		if (substr($relativePath, 0, 1) != '/') {
 			$controller = $this->getController();
-			$currentUri = $controller->getUri();
-			$uri = $currentUri . '/' . $relativePath;
+			$parent = $controller->parent;
+
+			if ($parent) {
+				$currentUri = $parent->getUri();
+				$uri = $currentUri . '/' . $relativePath;
+			}
 		} else {
 			$uri = $relativePath;
 		}
