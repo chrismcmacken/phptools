@@ -34,12 +34,12 @@
  */
 
 /**
- * LiteRoute is a very simplistic hiearchical front-end controller.  It's
+ * SlimRoute is a very simplistic hiearchical front-end controller.  It's
  * so light that it is just basically a router to get the request to the
  * right portion of your code.  If you are looking for more, try out
  * Symfony, Konstrukt, or maybe Phabricator.
  */
-abstract class LiteRoute {
+abstract class SlimRoute {
 	protected $controller = null;
 	protected $request = null;  // WebRequest object
 	protected $parent = null;
@@ -132,7 +132,7 @@ abstract class LiteRoute {
 	 *
 	 * It might be this one.  It might be some child.  Who knows?
 	 *
-	 * @return LiteRoute
+	 * @return SlimRoute
 	 */
 	public function getController() {
 		if (! is_null($this->controller)) {
