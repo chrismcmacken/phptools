@@ -77,6 +77,18 @@ class Dump {
 
 
 	/**
+	 * Convert to a string, in case "echo Dump::out($var)" is used.
+	 *
+	 * @return string
+	 */
+	public function __toString() {
+		ob_start();
+		$this->dumpStart();
+		return ob_get_clean();
+	}
+
+
+	/**
 	 * Set the htmlFlag so we output HTML instead of using autodetection
 	 *
 	 * @return $this
@@ -977,9 +989,7 @@ function dumpToggle(o) {
 	 */
 	public function returned() {
 		$this->displayFlag = false;
-		ob_start();
-		$this->dumpStart();
-		return ob_get_clean();
+		return $this->__toString();
 	}
 
 
