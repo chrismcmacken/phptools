@@ -336,13 +336,13 @@ class WebRequest {
 	 * @throws ErrorException Invalid method
 	 */
 	public function sanitizeMethod() {
-		if (in_array(array(
+		if (in_array($this->method(), array(
 			'HEAD',
 			'GET',
 			'POST',
 			'PUT',
 			'DELETE'
-		), $this->method())) {
+		))) {
 			return;
 		}
 

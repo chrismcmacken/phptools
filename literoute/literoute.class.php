@@ -78,7 +78,7 @@ abstract class LiteRoute {
 	 */
 	public function handle() {
 		$controller = $this->getController();
-		$method = $request->method();
+		$method = $this->request->method();
 		$method = ucfirst(strtolower($method));
 		$methodName = 'handle' . $method;
 		$controller->$methodName();
