@@ -113,7 +113,7 @@ abstract class SlimRoute {
 		$method = ucfirst(strtolower($method));
 		$methodName = 'handle' . $method;
 		$controller->$methodName();
-		$controller->render();
+		return $controller->render();
 	}
 
 
