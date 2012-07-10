@@ -40,7 +40,9 @@
  * Symfony, Konstrukt, or maybe Phabricator.
  */
 abstract class LiteRoute {
+	protected $controller = null;
 	protected $request = null;  // WebRequest object
+	protected $parent = null;
 	protected $uri = '';  // Not the full URI, just the one for this component
 
 
@@ -50,8 +52,8 @@ abstract class LiteRoute {
 	 * @param string $uri URI that's left for processing - you shouldn't need it
 	 * @param WebRequest $request Where one can get POST/GET/etc
 	 */
-	public function __construct($uri = null, $request = null) {
-		if (is_null($context)) {
+	public function __construct($uri = null, $request = null, $parent = null) {
+		if (is_null($request)) {
 			$request = new WebRequest();
 		}
 
@@ -61,6 +63,7 @@ abstract class LiteRoute {
 
 		$this->uri = $uri;
 		$this->request = $request;
+		$this->parent = null;
 	}
 
 
@@ -78,13 +81,19 @@ abstract class LiteRoute {
 		$method = $request->method();
 		$method = ucfirst(strtolower($method));
 		$methodName = 'handle' . $method;
-
-		if (method_exists($controller, $methodName)) {
-			$controller->$methodName();
-		}
-
+		$controller->$methodName();
 		$controller->render();
 	}
+
+
+	/**
+	 * Null functions that you are supposed to override when needed
+	 */
+	protected function handleDelete() {}
+	protected function handleGet() {}
+	protected function handleHead() {}
+	protected function handlePost() {}
+	protected function handlePut() {}
 
 
 	/**
@@ -95,6 +104,10 @@ abstract class LiteRoute {
 	 * @return LiteRoute
 	 */
 	public function getController() {
+		if (! is_null($this->controller)) {
+			return $controller;
+		}
+
 		$component = $this->nextComponent();
 
 		if (! is_null($component)) {
@@ -103,12 +116,28 @@ abstract class LiteRoute {
 			if (is_string($target)) {
 				$uri = substr($this->uri, 1 + strlen($component));
 				$this->uri = '/' . $component;
-				$class = new $className($uri, $request);
-				return $class->getController();
+				$class = new $className($uri, $request, $this);
+				$this->controller = $class->getController();
+				return $this->controller;
 			}
 		}
 
+		$this->controller = $this;
 		return $this;
+	}
+
+
+	/**
+	 * Return the current URI that got us up to this controller
+	 *
+	 * @return string
+	 */
+	public function getUri() {
+		if ($this->parent) {
+			return $this->parent->getUri() . $this->uri;
+		}
+
+		return $this->uri;
 	}
 
 
@@ -139,11 +168,45 @@ abstract class LiteRoute {
 
 
 	/**
+	 * Sends out the 302 Temporary Redirect header and exits.
+	 *
+	 * @param string $uri Relative/absolute URI on this site
+	 */
+	protected function redirect($uri) {
+		$fullUri = $this->url($uri);
+		@header('Location: ' . $fullUri);
+		exit();
+	}
+
+
+	/**
 	 * We've handled our action and now can render the page.
 	 *
 	 * @return mixed Varies based on your implementation.
 	 */
 	protected function render() {
 		throw new Exception('This page did not render content.');
+	}
+
+
+	/**
+	 * Create a URL
+	 *
+	 * @param string $relativePath
+	 * @return string Absolute URL
+	 */
+	public function url($relativePath) {
+		// Make the link absolute
+		if (substr($relativePath, 0, 1) != '/') {
+			$controller = $this->getController();
+			$currentUri = $controller->getUri();
+			$uri = $currentUri . '/' . $relativePath;
+		} else {
+			$uri = $relativePath;
+		}
+
+		$uri = preg_replace('~[^/]*/\\.\\./~', '/', $uri);
+		$uri = preg_replace('~/\\./~', '/', $uri);
+		return $uri;
 	}
 }
