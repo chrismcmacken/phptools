@@ -64,6 +64,10 @@ protected $variables = array();
 
 	// Report errors that happen in templates - must be public
 	public function errorHandler($code, $message, $file, $line) {
+		if (($code & error_reporting()) == 0) {
+			return true;
+		}
+
 		restore_error_handler();
 		ob_end_clean();
 		throw new Exception("$message (file: {$this->parsingFile}, line $line)");
@@ -93,10 +97,10 @@ protected $variables = array();
 	// Take a template string and change it into PHP
 	protected function parse($str) {
 		$replacements = array(
-			'/{{\s*(.*?)}}(\\n|\\r\\n?)?/' => '<?php $this->output($\\1) ?' . ">\\2\\2",
+			'/{{\s*(.*?)}}(\\n|\\r\\n?)?/' => '<?php $this->output(@ $\\1); ?' . ">\\2\\2",
 			'/\[\[/' => '<?php ',
 			'/\]\]/' => ' ?' . '>',
-			'/^[ \t\f]*@(.*)$/m' => '<?php \\1 ?' . '>',  // If placed later, removed spaces from the output of the next rule
+			'/^[ \t\f]*@(.*)$/m' => '<?php \\1 ?' . '>'
 		);
 		$php = preg_replace(array_keys($replacements), array_values($replacements), $str);
 		return $php;
