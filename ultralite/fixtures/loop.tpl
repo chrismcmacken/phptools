@@ -1,3 +1,3 @@
 @foreach ($list as $thing):
-loop {{thing}}
+loop {{$thing}}
 @endforeach

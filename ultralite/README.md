@@ -42,9 +42,9 @@ some special syntax that is specific to Ultralite.
 
     This can be a sample template file.
     I can show you the customer's name with <?php echo $name ?>
-    Alternately, I can use {{name}}, which is better.
+    Alternately, I can use {{$name}}, which is better.
 
-Variables assigned in your PHP can be used as `{{var_name}}`, which the
+Variables assigned in your PHP can be used as `{{$var_name}}`, which the
 template engine will parse specially.  The UltraliteHtml class will also call
 `htmlentities()` on variables displayed this way to add a layer of security and
 help avoid injection attacks.
@@ -69,7 +69,7 @@ your templates.  You can even include other templates.
 
     @if (count($cart)):
         @foreach ($cart as $item):
-            {{item->name}} costs {{$item->price}}
+            {{$item->name}} costs {{$item->price}}
 			@$this->inc('item_detail.tpl');
         @endforeach
     @else:
@@ -81,10 +81,10 @@ More About Including Templates
 
 Templates operate within a method of a class.  First, all variable assigned to
 the template engine are `extract()`ed into local variables, which lets the
-engine more easily handle `{{name}}` and `[[ echo $name ]]` style constructs.
+engine more easily handle `{{$name}}` and `[[ echo $name ]]` style constructs.
 You're happier too, since you may use PHP code to assign variables, and then
-you don't need to remember if you should use `{{this->name}}` or `{{name}}` in
-your templates.
+you don't need to remember if you should use `{{$this->name}}` or `{{$name}}`
+in your templates.
 
 Included templates also get all assigned variables inherited, but none of your
 local variables.  This can cause confusion.  Here is some PHP code that will
@@ -109,11 +109,11 @@ show you the output of the template and why it works that way.  All of these
 files are in the `examples/` directory.
 
     # test1.tpl
-    Local: {{name}} is {{age}} years old.
-    This:  {{this->name}} is {{this->age}} years old.
+    Local: {{$name}} is {{$age}} years old.
+    This:  {{$this->name}} is {{$this->age}} years old.
     @$age /= 2
-    Local: {{name}} is {{age}} years old. -- CHANGED
-    This:  {{this->name}} is {{this->age}} years old. -- SAME
+    Local: {{$name}} is {{$age}} years old. -- CHANGED
+    This:  {{$this->name}} is {{$this->age}} years old. -- SAME
 
 Results:
 
@@ -129,11 +129,11 @@ change an object, the object is changed with either reference method since
 objects are always passed by reference.
 
     # test2.tpl
-    Local: {{favoritePet->name}} is the favorite.
-    This:  {{this->favoritePet->name}} is the favorite.
+    Local: {{$favoritePet->name}} is the favorite.
+    This:  {{$this->favoritePet->name}} is the favorite.
     @$favoritePet->name = 'Meow Meow';
-    Local: {{favoritePet->name}} is the favorite. -- CHANGED
-    This:  {{this->favoritePet->name}} is the favorite. -- CHANGED
+    Local: {{$favoritePet->name}} is the favorite. -- CHANGED
+    This:  {{$this->favoritePet->name}} is the favorite. -- CHANGED
 
 Results:
 
@@ -158,7 +158,7 @@ the cat names.  This one includes a child template.
 
     # test3b.tpl
     @if (isset($pet)):
-    Pet name: {{pet->name}}
+    Pet name: {{$pet->name}}
     @else:
     No pet object passed.
     @endif

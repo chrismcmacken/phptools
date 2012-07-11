@@ -97,7 +97,7 @@ protected $variables = array();
 	// Take a template string and change it into PHP
 	protected function parse($str) {
 		$replacements = array(
-			'/{{\s*(.*?)}}(\\n|\\r\\n?)?/' => '<?php $this->output(@ $\\1); ?' . ">\\2\\2",
+			'/{{\s*(.*?)}}(\\n|\\r\\n?)?/' => '<?php $this->output(@ \\1); ?' . ">\\2\\2",
 			'/\[\[/' => '<?php ',
 			'/\]\]/' => ' ?' . '>',
 			'/^[ \t\f]*@(.*)$/m' => '<?php \\1 ?' . '>'
