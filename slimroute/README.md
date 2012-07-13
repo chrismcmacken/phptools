@@ -103,7 +103,7 @@ After you make your own autoload.php and make sure it can load the RootControlle
         }
     }
 
-Whew.  That's a big example, but I hope you see how you can chain classes together with the ```map()``` function, and now I've illustrated the use of the WebRequest object a bit and two of the handle methods.
+Whew.  That's a big example, but I hope you see how you can chain classes together with the `map()` function, and now I've illustrated the use of the WebRequest object a bit and two of the handle methods.
 
 Advanced Usage
 --------------
@@ -171,7 +171,7 @@ other class's name.  Otherwise, don't return anything, return null, or don't ove
 Grabs the next portion from the URI and return it.  If there isn't anything, returns null.
 
 ### protected function redirect($uri = '')
-Redirects to $uri on the current site.  If nothing specified, it redirects to the URL of the current module.  If you pass '/', it redirects to the top level of the site.  This is not to be used with URLs that go off the site.  Also calls ```exit()``` so one never has to worry about the program continuing execution.
+Redirects to $uri on the current site.  If nothing specified, it redirects to the URL of the current module.  If you pass '/', it redirects to the top level of the site.  This is not to be used with URLs that go off the site.  Also calls `exit()` so one never has to worry about the program continuing execution.
 
 ### protected function render()
 Generates output, typically HTML.  Can return content or echo it.  Whatever is returned by render() is then returned by your call to handle(), so you can perform your output either inside the controller classes or outside.
