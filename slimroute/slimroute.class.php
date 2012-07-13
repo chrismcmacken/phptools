@@ -199,9 +199,9 @@ abstract class SlimRoute {
 	/**
 	 * Sends out the 302 Temporary Redirect header and exits.
 	 *
-	 * @param string $uri Relative/absolute URI on this site
+	 * @param string $uri Relative URI on this site
 	 */
-	protected function redirect($uri) {
+	protected function redirect($uri = '') {
 		$fullUri = $this->url($uri);
 		@header('Location: ' . $fullUri);
 		exit();
