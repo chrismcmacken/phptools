@@ -149,7 +149,7 @@ class Ultralite {
 	// into [[$this->inc(template)]] and
 	// [[$this->inc(template, array(arg=>val, arg2=>val2))]]
 	protected function parseInclude($matches) {
-		$out = '[[$this->inc(' . $this->quote($matches[1]);
+		$out = '<?php $this->inc(' . $this->quote($matches[1]);
 		$args = array();
 
 		if (count($matches) >= 3) {
@@ -168,7 +168,11 @@ class Ultralite {
 			$out .= ')';
 		}
 
-		$out .= ')]]';
+		$out .= ') ?' . '>';
+
+		// Do not worry about the newline at the end of the line being
+		// consumed by PHP since the template file will probably end with
+		// a newline
 		return $out;
 	}
 

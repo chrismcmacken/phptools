@@ -209,7 +209,7 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 			),
 			'include via braces with end of line' => array(
 				"{{>partial.tpl}}\n@echo HI\n",
-				"<?php \$this->inc('partial.tpl') ?" . "><?php echo \"\\n\"; ?" . ">\n<?php echo HI ?" . ">\n"
+				"<?php \$this->inc('partial.tpl') ?" . ">\n<?php echo HI ?" . ">\n"
 			),
 		);
 	}
