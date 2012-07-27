@@ -94,6 +94,19 @@ class Ultralite {
 		return file_get_contents($rfn);
 	}
 
+	// include another template in your template
+	//
+	// Shorthand:  {{>template.tpl}}
+	// Long:  [[$this->inc('template.tpl')]]
+	//
+	// Shorthand:  {{>template.tpl a=1 b='BBB'}}
+	// Long:  [[$this->inc('template.tpl', array('a'=>1, 'b'=>'BBB'))]]
+	protected function inc($template, $moreVars = array()) {
+		$class = get_class($this);
+		$engine = new $class($this->baseDir, array_merge($this->variables, $moreVars));
+		echo $engine->render($template);
+	}
+
 	// A simple method only for overrides
 	protected function output($val) {
 		echo $val;
@@ -147,13 +160,6 @@ class Ultralite {
 		}
 
 		return "'" . addslashes($thing) . "'";
-	}
-
-	// include another file -- use "@$this->inc('other.tpl')" in your template
-	protected function inc($template, $moreVars = array()) {
-		$class = get_class($this);
-		$engine = new $class($this->baseDir, array_merge($this->variables, $moreVars));
-		echo $engine->render($template);
 	}
 
 	// Generate the processed template results
