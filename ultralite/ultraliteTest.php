@@ -153,7 +153,7 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 			),
 			'variable end of line' => array(
 				'a {{$a}}' . "\nline2",
-				'a <?php $this->output(@ $a); ?' . ">\n\nline2",
+				'a <?php $this->output(@ $a); ?' . "><?php echo \"\\n\"; ?" . ">\nline2",
 			),
 			'at' => array(
 				"@function()",
@@ -173,11 +173,11 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 			),
 			'block' => array(
 				"Line 1\nblah [[function()]]\n line 3",
-				"Line 1\nblah <?php function() ?" . ">\n line 3"
+				"Line 1\nblah <?php function() ?" . "><?php echo \"\\n\"; ?" . ">\n line 3"
 			),
 			'block with whitespace' => array(
 				"Line 1\nblah [[ function() ]]\n line 3",
-				"Line 1\nblah <?php function() ?" . ">\n line 3"
+				"Line 1\nblah <?php function() ?" . "><?php echo \"\\n\"; ?" . ">\n line 3"
 			),
 			'include via inc' => array(
 				'@$this->inc("bad");',
@@ -206,6 +206,10 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 			'include via braces with nasty params' => array(
 				'{{>"bad" a=T_IF \'c\'="string }} \\\\\\" string" "d"=\'string2 \\\\\\\' yeah\'}}',
 				'<?php $this->inc("bad", array(\'a\'=>T_IF, \'c\'=>"string }} \\\\\\" string", "d"=>\'string2 \\\\\\\' yeah\')) ?' . '>'
+			),
+			'include via braces with end of line' => array(
+				"{{>partial.tpl}}\n@echo HI\n",
+				"<?php \$this->inc('partial.tpl') ?" . "><?php echo \"\\n\"; ?" . ">\n<?php echo HI ?" . ">\n"
 			),
 		);
 	}

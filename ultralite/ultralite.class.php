@@ -114,11 +114,31 @@ class Ultralite {
 
 	// Take a template string and change it into PHP
 	public function parse($str) {
-		$str = preg_replace_callback('/{{>\s*(' . static::$argPattern . ')?((?:\s*(?:' . static::$argPattern . ')\s*=\s*(?:' . static::$argPattern . '))*)\s*}}(\\n|\\r\\n?)?/', array($this, 'parseInclude'), $str);
+		// Handle the {{>template}} shorthand, which requires a callback
+		$str = preg_replace_callback('/{{>\s*(' . static::$argPattern . ')?((?:\s*(?:' . static::$argPattern . ')\s*=\s*(?:' . static::$argPattern . '))*)\s*}}/', array($this, 'parseInclude'), $str);
+
+		// You will notice duplications in here.  PHP eats newlines following
+		// close PHP tags, so we're compensating to preserve whitespace as
+		// would be expected from a templating system.  Another goal is to
+		// preserve the correct line number for the template.  Tricky.
 		$replacements = array(
-			'/{{\s*(.*?)\s*}}(\\n|\\r\\n?)?/' => '<?php $this->output(@ \\1); ?' . ">\\2\\2",
+			// Catch newlines
+
+			// {{$variable}} or {{function()}}
+			'/({{\s*(?:.*?)\s*}})\\n/' => '\\1<?php echo "\\n"; ?' . ">\n",
+			'/({{\s*(?:.*?)\s*}})\\r\\n/' => '\\1<?php echo "\\r\\n"; ?' . ">\r\\n",
+			'/({{\s*(?:.*?)\s*}})\\r/' => '\\1<?php echo "\\r"; ?' . ">\r",
+			'/{{\s*(.*?)\s*}}/' => '<?php $this->output(@ \\1); ?' . '>',
+
+			// [[ PHP code ]]
+			// Newline case is tricky: the code may not end with a semicolon
 			'/\[\[[\n\r\f\t ]*/' => '<?php ',
+			'/([\n\r\f\t ]*\]\])\\n/' => '\\1<?php echo "\\n"; ?' . ">\n",
+			'/([\n\r\f\t ]*\]\])\\r\\n/' => '\\1<?php echo "\\r\\n"; ?' . ">\r\n",
+			'/([\n\r\f\t ]*\]\])\\r/' => '\\1<?php echo "\\r"; ?' . ">\r",
 			'/[\n\r\f\t ]*\]\]/' => ' ?' . '>',
+
+			// @ PHP code
 			'/^[ \t\f]*@[\f\t ]*(.*[^\n\r\t\f ])?[ \t\f]*$/m' => '<?php \\1 ?' . '>'
 		);
 		$php = preg_replace(array_keys($replacements), array_values($replacements), $str);
