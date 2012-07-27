@@ -65,12 +65,13 @@ Lastly, a single line of PHP can be included in your template.
     @echo "Hello!\n"
 
 Using PHP's [Alternate Syntax], one can make loops shorter and more readable in
-your templates.  You can even include other templates.
+your templates.  You can even include other templates.  We allow a short way
+and a long way.  Here is the short way.
 
     @if (count($cart)):
         @foreach ($cart as $item):
             {{$item->name}} costs {{$item->price}}
-			@$this->inc('item_detail.tpl');
+			{{>item_detail.tpl}}
         @endforeach
     @else:
         There is nothing in your cart
@@ -149,11 +150,11 @@ the cat names.  This one includes a child template.
     # test3.tpl
     -- This won't work
     @foreach ($pets as $pet):
-    @$this->inc('test3b.tpl')
+	{{>test3b.tpl}}
     @endforeach
     -- This does work
     @foreach ($pets as $pet):
-    @$this->inc('test3b.tpl', array('pet', $pet))
+	{{>test3b.tpl pet=$pet}}
     @endforeach
 
     # test3b.tpl
@@ -171,16 +172,30 @@ Results:
     No pet object passed.
     -- This does work
     # test3b.tpl
-    No pet object passed.
+    Pet name: Meow Meow
 
 The foreach loop in `test3.tpl` assigns the pets into a local variable, `$pet`.
 This is not assigned to the template engine and thus is not inherited when you
-include a child template via `$this->inc('test3b.tpl')`.  To get around this
-problem, you can pass an array of additional values to assign in the child
-template when you call `$this->inc()`, like how we do it for the second half of
+include a child template via `{{>test3b.tpl}}`.  To get around this problem,
+you can pass an array of additional values to assign in the child template when
+you include the partial template.  We illustrate that in the second half of
 `test3.tpl`.
 
 It's a little complicated and I hope that I didn't lose you.
+
+We can pass lots of values too!
+
+    {{>child a=1 b=true token=T_IF string="quoted strings work too"}}
+
+I alluded earlier to a longer form of including templates.  Here it is, with
+the shorthand examples so you can fully understand why you'll want to usually
+avoid the longer version.
+
+	Short: {{>child.tpl}}
+	Long: [[$this->inc('child.tpl')]]
+
+	Short: {{>child.tpl target=$val color="blue"}}
+	Long: [[$this->inc('child.tpl', array('target'=>$val, 'color'=>"blue"))]]
 
 Looking For More?
 -----------------
