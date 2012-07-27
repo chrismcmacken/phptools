@@ -129,4 +129,98 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 
 		$this->assertEquals($result, $output);
 	}
+
+
+	/**
+	 * Confirm the right PHP code is generated for various tags and
+	 * elements.
+	 *
+	 * @return array
+	 */
+	public function dataParse() {
+		return array(
+			'plain text' => array(
+				"blah blah\nline 2",
+				"blah blah\nline 2",
+			),
+			'variable' => array(
+				'a {{$a}}',
+				'a <?php $this->output(@ $a); ?' . '>',
+			),
+			'variable with whitespace' => array(
+				"a {{  \t  \$a  \t  }}",
+				'a <?php $this->output(@ $a); ?' . '>',
+			),
+			'variable end of line' => array(
+				'a {{$a}}' . "\nline2",
+				'a <?php $this->output(@ $a); ?' . ">\n\nline2",
+			),
+			'at' => array(
+				"@function()",
+				"<?php function() ?" . ">"
+			),
+			'at with whitespace' => array(
+				"\t @ function() ",
+				"<?php function() ?" . ">"
+			),
+			'at end of line' => array(
+				"\t@function()\nLine2",
+				"<?php function() ?" . ">\nLine2"
+			),
+			'at line two' => array(
+				"One two three.\n@blah_blah\n",
+				"One two three.\n<?php blah_blah ?" . ">\n"
+			),
+			'block' => array(
+				"Line 1\nblah [[function()]]\n line 3",
+				"Line 1\nblah <?php function() ?" . ">\n line 3"
+			),
+			'block with whitespace' => array(
+				"Line 1\nblah [[ function() ]]\n line 3",
+				"Line 1\nblah <?php function() ?" . ">\n line 3"
+			),
+			'include via inc' => array(
+				'@$this->inc("bad");',
+				'<?php $this->inc("bad"); ?' . '>'
+			),
+			'include via inc with params' => array(
+				'@$this->inc("bad", array("a"=>"b"));',
+				'<?php $this->inc("bad", array("a"=>"b")); ?' . '>'
+			),
+			'include via braces' => array(
+				'{{>bad}}',
+				'<?php $this->inc(\'bad\') ?' . '>'
+			),
+			'include via braces with param' => array(
+				'{{>person chris="awesome"}}',
+				'<?php $this->inc(\'person\', array(\'chris\'=>"awesome")) ?' . '>'
+			),
+			'include via braces with quoted param' => array(
+				'{{>person chris="awe\\"some"}}',
+				'<?php $this->inc(\'person\', array(\'chris\'=>"awe\\"some")) ?' . '>'
+			),
+			'include via braces with two params' => array(
+				'{{>bad a=true b=7}}',
+				'<?php $this->inc(\'bad\', array(\'a\'=>true, \'b\'=>7)) ?' . '>'
+			),
+			'include via braces with nasty params' => array(
+				'{{>"bad" a=T_IF \'c\'="string }} \\\\\\" string" "d"=\'string2 \\\\\\\' yeah\'}}',
+				'<?php $this->inc("bad", array(\'a\'=>T_IF, \'c\'=>"string }} \\\\\\" string", "d"=>\'string2 \\\\\\\' yeah\')) ?' . '>'
+			),
+		);
+	}
+
+
+	/**
+	 * Try parsing a template and change it to valid PHP
+	 *
+	 * @dataProvider dataParse
+	 * @param string $input
+	 * @param string $result
+	 */
+	public function testParse($input, $result) {
+		$engine = new Ultralite(__DIR__ . '/fixtures');
+		$actual = $engine->parse($input);
+		$this->assertEquals($result, $actual);
+	}
 }

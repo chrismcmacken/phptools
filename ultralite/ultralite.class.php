@@ -40,8 +40,13 @@
  * This is just a slimmed down version of another templating engine, Templum.
  * Check it out at http://templum.electricmonk.nl/
  */
-class Ultralite { protected $baseDir = null; protected $parsingFile = null;
-protected $variables = array();
+class Ultralite {
+	// Pattern for matching an argument without spaces or quoted argument
+	//    "([^\\"]|\\.)*"
+	static protected $argPattern = '[^"\'\s][^\s]*|"(?:[^\\\\"]|\\\\.)*"|\'(?:[^\\\\\']|\\\\.)*\'';
+	protected $baseDir = null;
+	protected $parsingFile = null;
+	protected $variables = array();
 
 	public function __construct($templateDir, $variables = array()) {
 		$this->baseDir = $templateDir;
@@ -95,15 +100,53 @@ protected $variables = array();
 	}
 
 	// Take a template string and change it into PHP
-	protected function parse($str) {
+	public function parse($str) {
+		$str = preg_replace_callback('/{{>\s*(' . static::$argPattern . ')?((?:\s*(?:' . static::$argPattern . ')\s*=\s*(?:' . static::$argPattern . '))*)\s*}}(\\n|\\r\\n?)?/', array($this, 'parseInclude'), $str);
 		$replacements = array(
-			'/{{\s*(.*?)}}(\\n|\\r\\n?)?/' => '<?php $this->output(@ \\1); ?' . ">\\2\\2",
-			'/\[\[/' => '<?php ',
-			'/\]\]/' => ' ?' . '>',
-			'/^[ \t\f]*@(.*)$/m' => '<?php \\1 ?' . '>'
+			'/{{\s*(.*?)\s*}}(\\n|\\r\\n?)?/' => '<?php $this->output(@ \\1); ?' . ">\\2\\2",
+			'/\[\[[\n\r\f\t ]*/' => '<?php ',
+			'/[\n\r\f\t ]*\]\]/' => ' ?' . '>',
+			'/^[ \t\f]*@[\f\t ]*(.*[^\n\r\t\f ])?[ \t\f]*$/m' => '<?php \\1 ?' . '>'
 		);
 		$php = preg_replace(array_keys($replacements), array_values($replacements), $str);
 		return $php;
+	}
+
+	// Translate {{> template }} and {{> template arg=val arg2=val2}}
+	// into [[$this->inc(template)]] and
+	// [[$this->inc(template, array(arg=>val, arg2=>val2))]]
+	protected function parseInclude($matches) {
+		$out = '[[$this->inc(' . $this->quote($matches[1]);
+		$args = array();
+
+		if (count($matches) >= 3) {
+			$argsStr = $matches[2];
+			$sep = '';
+
+			while (preg_match('/\s*(' . static::$argPattern . ')\s*=\s*(' . static::$argPattern . ')\s*(.*)/', $argsStr, $submatches)) {
+				$args[] = $this->quote($submatches[1]) . '=>' . $submatches[2];
+				$argsStr = $submatches[3];
+			}
+		}
+
+		if (count($args)) {
+			$out .= ', array(';
+			$out .= implode(', ', $args);
+			$out .= ')';
+		}
+
+		$out .= ')]]';
+		return $out;
+	}
+
+	protected function quote($thing) {
+		$c = substr($thing, 0, 1);
+
+		if ($c == '"' || $c == "'") {
+			return $thing;
+		}
+
+		return "'" . addslashes($thing) . "'";
 	}
 
 	// include another file -- use "@$this->inc('other.tpl')" in your template
