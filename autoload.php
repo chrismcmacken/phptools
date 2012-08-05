@@ -4,6 +4,7 @@ spl_autoload_register(function ($name) {
 	$filename = strtolower($name) . '.class.php';
 	$filename = str_replace('_', DIRECTORY_SEPARATOR, $filename);
 	$paths = array(
+		'cache',
 		'crypto',
 		'db',
 		'dependencyinjectioncontainer',
