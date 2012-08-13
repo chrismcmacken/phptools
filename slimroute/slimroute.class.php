@@ -41,10 +41,10 @@
  */
 abstract class SlimRoute {
 	protected $controller = null;
-	protected $request = null;  // WebRequest object
-	protected $parent = null;
-	protected $uri = '';  // Not the full URI, just the one for this component
 	protected $magicVariables = null;
+	protected $parent = null;
+	public $request = null;  // WebRequest object
+	protected $uri = '';  // Not the full URI, just the one for this component
 
 
 	/**
