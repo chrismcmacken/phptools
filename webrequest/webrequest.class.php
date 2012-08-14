@@ -216,7 +216,7 @@ class WebRequest {
 	 * @param mixed $default optional, defaults to null
 	 * @return string|array
 	 */
-	public function request($name, $default = null) {
+	public function request($name = null, $default = null) {
 		if (is_null($name)) {
 			// Using + produces a union of two arrays.  Similar to
 			// array_merge, but doesn't renumber numeric keys, and the left-
