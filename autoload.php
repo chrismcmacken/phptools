@@ -11,6 +11,7 @@ spl_autoload_register(function ($name) {
 		'dump',
 		'friend',
 		'logger',
+		'renamer',
 		'session2',
 		'slimroute',
 		'tokenizer',
