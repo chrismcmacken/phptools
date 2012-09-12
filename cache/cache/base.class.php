@@ -50,7 +50,7 @@ abstract class Cache_Base {
 	 *
 	 * @return boolean True on success, false on failure
 	 */
-	public function clear();
+	abstract public function clear();
 
 	/**
 	 * Delete a key/value from the cache.
@@ -58,7 +58,7 @@ abstract class Cache_Base {
 	 * @param string $key Name of the thing to cache
 	 * @return boolean True on success, false on failure
 	 */
-	public function delete($key);
+	abstract public function delete($key);
 
 	/**
 	 * Retrieve a value for a key.
@@ -66,7 +66,7 @@ abstract class Cache_Base {
 	 * @param string $key Name of the thing to cache
 	 * @return mixed The stored value or false if not found
 	 */
-	public function get($key);
+	abstract public function get($key);
 
 	/**
 	 * "Lock" a value so only one process can own it
@@ -101,7 +101,7 @@ abstract class Cache_Base {
 			$this->activeLocks[$key] = $lockValue;
 		}
 
-		return $re
+		return $ret;
 	}
 
 	/**
@@ -136,7 +136,7 @@ abstract class Cache_Base {
 	 * @param integer $ttl Time to live, in seconds
 	 * @return boolean True on success, false on failure
 	 */
-	public function set($key, $value, $ttl = 0);
+	abstract public function set($key, $value, $ttl = 0);
 
 	/**
 	 * Replaces a key/value to the cache as long as that key is already
