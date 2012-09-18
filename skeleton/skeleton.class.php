@@ -75,7 +75,7 @@ class Skeleton {
 			$callable = 'array("parent", "' . $safeName . '")';
 		}
 
-		$out .= "\t\$args = func_get_args();\n";
+		$out = "\t\$args = func_get_args();\n";
 		$out .= "\treturn call_user_func_array(" . $callable . ", \$args);\n";
 		return $out;
 	}
@@ -125,22 +125,22 @@ class Skeleton {
 		// Build the constructor specially
 		if ($constructor) {
 			if (! $constructor->isFinal()) {
-				$out .= $this->methodDefinition($constructor);
+				$out .= $this->methodDeclaration($constructor);
 				$out .= " {\n";
 				$out .= $this->constructorMethod($method);
 				$out .= "}\n";
 			}
 		} else {
 			$out .= "public function __construct() {\n";
-			$out .= $this->constructorMethod($method);
-			$out .= "\n";
+			$out .= $this->constructorMethod(null);
+			$out .= "}\n";
 		}
 
 		// Always build static methods
 		foreach ($reflect->getMethods(ReflectionMethod::IS_STATIC) as $method) {
 			// Skip final, skip the constructor
 			if (! $method->isFinal() && $method !== $constructor) {
-				$out .= $this->methodDefinition($method);
+				$out .= $this->methodDeclaration($method);
 				$out .= " {\n";
 				$out .= $this->chainMethod($method);
 				$out .= "}\n";
@@ -219,7 +219,7 @@ class Skeleton {
 
 
 	/**
-	 * Gets a method definition for a method.
+	 * Gets the declaration for a method.
 	 *
 	 * @param ReflectionMethod $method
 	 * @return string
@@ -312,11 +312,11 @@ class Skeleton {
 	public function reflect() {
 		$key = strtolower($this->originalClass);
 		
-		if (! $this->reflections[$key]) {
-			$this->reflections[$key] = new ReflectionClass($this->originalClass);
+		if (empty(static::$reflections[$key])) {
+			static::$reflections[$key] = new ReflectionClass($this->originalClass);
 		}
 
-		return $this->reflections[$key];
+		return static::$reflections[$key];
 	}
 
 
