@@ -38,6 +38,9 @@ acknowledgments.
  * 
  * @throws ErrorException
  */
+
+require_once(__DIR__ . '/../skeleton/skeleton.class.php');
+
 class Friend {
 
     /**
@@ -234,153 +237,23 @@ class Friend {
 
 
 	/**
-	 * Build a new class to extend our friended object so we can call a
-	 * static method somewhere in our ancestor tree and let calls go back
-	 * down the tree properly.
-	 *
-	 * @param string $originalName
-	 * @return string Static class name
-	 */
-	protected function getStaticCassDefinition($originalName) {
-		// Create the class and save it
-		$newClassName = uniqid('Friend_' . $originalName . '_');
-		$classDef = 'class ' . $newClassName . ' extends ' . $originalName . "{\n";
-		$refl = new ReflectionClass($originalName);
-
-		// Build each static method
-		foreach ($refl->getMethods(ReflectionMethod::IS_STATIC) as $method) {
-			if (! $method->isFinal()) {
-				$classDef .= $this->getStaticMethodDefinition($method);
-			}
-		}
-
-		// Finish the class
-		$classDef .= "}\n";
-		eval($classDef);
-		return $newClassName;
-	}
-
-	
-	/**
 	 * Gets a static class name for a method to work around a PHP bug with
 	 * reflection and late static binding calling down to descendents.
 	 *
 	 * @return string
 	 */
 	protected function getStaticClassName() {
-		$originalname = get_class($this->object);
+		$originalName = get_class($this->object);
 
 		if (! empty(static::$staticClassnames[$originalName])) {
 			return static::$staticClassNames[$originalName];
 		}
 
-		$newClassName = $this->getStaticClassDefinition($originalName);
+		$skeleton = new Skeleton($originalName);
+		$newClassName = $skeleton->create();  // Returns new class name
 		static::$staticClassNames[$originalName] = $newClassName;
 		return $newClassName;
 	}
-
-
-	/**
-	 * Gets a method definition for a static method so you can create a
-	 * class on the fly.
-	 *
-	 * FIXME:  This won't work if you have a static method expecting
-	 * arguments that aren't listed in the function declaration.
-	 *
-	 * FIXME:  Should probably pull this static class generation stuff
-	 * out into its own class
-	 *
-	 * @param ReflectionMethod $method
-	 * @return string
-	 */
-	protected function getStaticMethodDefinition($method) {
-		$out = '';
-
-		// There's no reason it shouldn't be static, but to be generic ...
-		if ($method->isStatic()) {
-			$out .= 'static ';
-		}
-
-		if ($method->isPrivate()) {
-			$out .= 'private ';
-		} elseif ($method->isProtected()) {
-			$out .= 'protected ';
-		} else {
-			$out .= 'public ';
-		}
-
-		$out .= 'function ';
-
-		if ($method->returnsReference()) {
-			$out .= '&';
-		}
-
-		$out .= $method->getName();
-		$out .= '(';
-		$out .= $this->getStaticMethodParameters($method, true);
-		$out .= ') { return parent::' . $method->getName() . '(';
-		$out .= $this->getStaticMethodParameters($method, false);
-		$out .= "); }\n";
-		return $out;
-	}
-
-
-	/**
-	 * Return a list of parameters, possibly type hinted, for a given
-	 * reflection method.
-	 *
-	 * @param ReflectionMethod $method
-	 * @param boolean asDeclaration
-	 * @return string
-	 */
-	protected function getStaticMethodParameters($method, $asDeclaration) {
-		$param = array();
-
-		if (! $asDeclaration) {
-			foreach ($method->getParameters() as $parameter) {
-				$param[] = '$' . $parameter->getName();
-			}
-
-			return implode(', ', $param);
-		}
-
-		foreach ($method->getParameters() as $parameter) {
-			$out = '';
-
-			if ($parameter->isArray()) {
-				$out .= 'array ';
-			} else {
-				try {
-					$class = $parameter->getClass();
-
-					if ($class) {
-						$out .= $class->getName() . ' ';
-					}
-				} catch (ReflectionException $e) {
-					// Do nothing
-				}
-			}
-
-			if ($parameter->isPassedByReference()) {
-				$out .= '&';
-			}
-
-			$out .= '$' . $parameter->getName();
-
-			if ($parameter->isDefaultValueAvailable()) {
-				$value = $parameter->getDefaultValue();
-				$out .= ' = ' . var_export($value, true);
-			} elseif ($parameter->isOptional()) {
-				$out .= ' = null';
-			}
-
-			$param[] = $out;
-		}
-
-		return implode(', ', $param);
-	}
-
-
 
 
     /**
