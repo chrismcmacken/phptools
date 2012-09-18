@@ -83,7 +83,7 @@ class Friend {
 
 		if (! is_null($method)) {
 			// Don't put this in the try/catch since it could rightfully throw
-			return $reflectionMethod->invokeArgs($this->object, $arguments);
+			return $method->invokeArgs($this->object, $arguments);
 		}
 
 		return $this->callMagic('__call', array($name, $arguments), 'Method ' . $name . ' does not exist');
@@ -225,7 +225,7 @@ class Friend {
 
 			if ($method->isStatic()) {
 				$extendedClassName = $this->getStaticClassName();
-				$method = new ReflectionMethod($extendedClassname, $name);
+				$method = new ReflectionMethod($extendedClassName, $name);
 				$method->setAccessible(true);
 			}
 		} catch (Exception $e) {
@@ -245,7 +245,7 @@ class Friend {
 	protected function getStaticClassName() {
 		$originalName = get_class($this->object);
 
-		if (! empty(static::$staticClassnames[$originalName])) {
+		if (! empty(static::$staticClassNames[$originalName])) {
 			return static::$staticClassNames[$originalName];
 		}
 
