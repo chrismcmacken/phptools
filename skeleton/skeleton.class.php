@@ -70,7 +70,7 @@ class Skeleton {
 		$callable = 'array($this, "parent::' . $safeName . '")';
 
 		if ($method->isStatic()) {
-			$callable = 'array("' . $safeOrig . '", "parent::' . $safeName . '")';
+			$callable = 'array("' . $safeOrig . '", "' . $safeName . '")';
 		} elseif (version_compare(PHP_VERSION, "5.3.0", "<")) {
 			$callable = 'array("parent", "' . $safeName . '")';
 		}
