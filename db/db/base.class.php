@@ -98,6 +98,7 @@ abstract class DB_Base {
 	 * USE [database_name]
 	 *
 	 * @param string $db Database name
+	 * @return boolean Result from dbSwitchIfNeeded()
 	 */
 	public function db($db) {
 		$this->db = $db;

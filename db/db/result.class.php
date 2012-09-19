@@ -359,6 +359,7 @@ abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 	 * Get the data at a specific offset
 	 *
 	 * @param mixed $offset Row number
+	 * @return array Row data as an associative array
 	 * @throws Exception
 	 */
 	public function offsetGet($offset) {

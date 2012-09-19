@@ -470,10 +470,12 @@ function dumpToggle(o) {
 		$this->collapseStart(count($what), ! empty($what));
 		$this->indent ++;
 		$isFirst = true;
+
 		foreach ($what as $k => $v) {
 			if (! $isFirst) {
 				echo ',';
 			}
+
 			$isFirst = false;
 			$this->newline();
 			$this->span('key', $this->dumpAnything($k, true));
@@ -482,10 +484,13 @@ function dumpToggle(o) {
 			$this->dumpAnything($v);
 			$this->popStack();
 		}
+
 		$this->indent --;
+
 		if (count($what)) {
 			$this->newline();
 		}
+
 		$this->collapseEnd();
 		$this->span('array', ')');
 	}
@@ -550,10 +555,11 @@ function dumpToggle(o) {
 	 *
 	 * @param mixed $what
 	 * @param boolean $silent Not honored
+	 * @return string
 	 */
 	protected function helperObject($what, $silent = false) {
 		if ($this->isRecursive($what)) {
-			return;
+			return '';
 		}
 
 		$className = get_class($what);

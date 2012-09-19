@@ -162,7 +162,7 @@ class Friend {
      *
      * @param  $name
      * @param  $value
-     * @return void
+     * @return mixed
      */
     public function __set($name, $value) {
         $property = $this->getProperty($name);
@@ -179,7 +179,7 @@ class Friend {
      * Tries to unset $this->object->$name, not quite right
      *
      * @param  $name
-     * @return void
+     * @return mixed
      */
     public function __unset($name) {
         $property = $this->getProperty($name);

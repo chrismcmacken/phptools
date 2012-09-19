@@ -99,7 +99,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * object initialized to that position.
 	 *
 	 * @param mixed $tokenList T_* constant or array of T_* constants
-	 * @param function $callback Callback, taking a single parameter, optional
+	 * @param callable $callback Callback, taking a single parameter, optional
 	 * @return array Indices of where that token was found
 	 */
 	public function findTokens($tokenList, $callback = null) {
