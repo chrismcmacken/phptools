@@ -112,19 +112,36 @@ abstract class SlimRoute {
 		$method = $this->request->method();
 		$method = ucfirst(strtolower($method));
 		$methodName = 'handle' . $method;
-		$controller->$methodName();
-		return $controller->render();
+		return $controller->$methodName();
 	}
 
 
 	/**
 	 * Null functions that you are supposed to override when needed
 	 */
-	protected function handleDelete() {}
-	protected function handleGet() {}
-	protected function handleHead() {}
-	protected function handlePost() {}
-	protected function handlePut() {}
+	protected function handleDelete() {
+		throw new Exception('This page did not render content.');
+	}
+
+
+	protected function handleGet() {
+		throw new Exception('This page did not render content.');
+	}
+
+
+	protected function handleHead() {
+		return $this->handleGet();
+	}
+
+
+	protected function handlePost() {
+		return $this->handleGet();
+	}
+
+
+	protected function handlePut() {
+		throw new Exception('This page did not render content.');
+	}
 
 
 	/**
@@ -205,16 +222,6 @@ abstract class SlimRoute {
 		$fullUri = $this->url($uri);
 		@header('Location: ' . $fullUri);
 		exit();
-	}
-
-
-	/**
-	 * We've handled our action and now can render the page.
-	 *
-	 * @return mixed Varies based on your implementation.
-	 */
-	protected function render() {
-		throw new Exception('This page did not render content.');
 	}
 
 

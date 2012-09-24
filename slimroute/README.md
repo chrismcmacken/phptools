@@ -22,7 +22,8 @@ First, make a root class that will handle requests at the top level.  Let's say 
             $this->redirect('/');  // Redirect requests for anything else
         }
         // Generate content
-        public function render() {
+		// Called automatically for get, post, and head requests
+        public function handleGet() {
             echo "<a href=\"/user/\">Go to user section</a>\n";
         }
     }
@@ -50,14 +51,15 @@ And we need to force all web requests to go to our controller.  In Apache, you c
 After you make your own autoload.php and make sure it can load the RootController class, then you will be able to view the site and get a link that will go to the user section.  Unfortunately, clicking that link will throw an exception saying that the UserController does not exist, but we can fix that.  Let's make a new UserController class.  Since this is just an example, we want all GET requests to return a username as a form and POST requests to be able to update the username.  Hooking this up to your User class (not provided) is an exercise left up to you.
 
     class UserController extends SlimRoute {
-        $user = null;
         // The map() function is not necessary since this does not
         // hand control off to another class.
         public function handleGet() {
             $userId = $this->nextComponent();  // Grab the next portion from the URL
             if (! empty($userId)) {
-                $this->loadUser($userId);
+                $user = $this->loadUser($userId);
             }
+
+			return $this->render($user);
         }
         // Handle all POST requests to this controller
         public function handlePost() {
@@ -68,24 +70,26 @@ After you make your own autoload.php and make sure it can load the RootControlle
             if (empty($id) || empty($username)) {
                 $this->redirect();
             }
-            $this->loadUser($id);
-            $this->user->username = $username;
-            $this->user->save();
+            $user = $this->loadUser($id);
+            $user->username = $username;
+            $user->save();
+			return $this->render($user);
         }
         // Helper method to load a user and redirect if the user can't be loaded
         public function loadUser($id) {
-            $this->user = User::load($userId);
+            $user = User::load($userId);
             // If no user found, redirect to "/user/" to show the list of users
             if (! $user) {
                 // Redirects to the URL of the user page (/user/)
                 $this->redirect();
                 // Also calls exit() automatically
             }
+			return $user;
         }
         // If no user loaded, show a list
         // If a user loaded, show the form to change username
-        public function render() {
-            if (! $this->user) {
+        public function render($user = null) {
+            if (! $user) {
                 // Maybe list user IDs?
                 $idList = User::getIds();
                 echo "<ul>\n";
@@ -95,7 +99,7 @@ After you make your own autoload.php and make sure it can load the RootControlle
                 echo "</ul>\n";
             } else {
                 echo "<form method=\"post\" action=\"" . $this->url() . "\">\n";
-                echo "<input type=\"hidden\" name=\"id\" value=\"" . urlencode($this->user->id) . "\">\n";
+                echo "<input type=\"hidden\" name=\"id\" value=\"" . urlencode($user->id) . "\">\n";
                 echo "<input type=\"text\" name=\"username\" value=\"" . urlencode($user->username) . "\">\n";
                 echo "<input type=\"submit\" value=\"Update Username\">\n";
                 echo "</form>\n";
@@ -178,6 +182,24 @@ Generates output, typically HTML.  Can return content or echo it.  Whatever is r
 
 ### public function url($relativePath)
 Generate a URL, relative to the currently executing controller (ie. the one returned by getController()).
+
+Properties
+----------
+
+### protected $controller
+This is the controller object that we will be using for handling the request.
+
+### protected $magicVariables
+A shared object that contains the magically assigned variables.  When you use `$slimRoute->someProperty = blah;`, the `someProperty` property get assigned to `$magicVariables`.
+
+### protected $parent
+The parent controller to the one that is executing.
+
+### public $request
+The WebRequest object that is generated during the handling of the request.  It's public so things outside of SlimRoute can also get access to the request's information.
+
+### protected $uri
+The URI for just the controller we're accessing.
 
 License
 -------
