@@ -156,6 +156,57 @@ class WebRequest {
 	}
 
 	/**
+	 * Returns data that was sent in the request.  This may not work well for
+	 * POST since PHP already parsed the input to provide the script with
+	 * the $_POST superglobal.
+	 *
+	 * When dealing with large amounts of data, you may wish to use
+	 * inputDataToFile() instead.
+	 *
+	 * @return string
+	 */
+	public function inputData() {
+		return file_get_contents('php://input');
+	}
+
+	/**
+	 * Copies the input data to a file
+	 *
+	 * The $file parameter can either be a file pointer or a filename.
+	 * You can use fopen('...filename...', 'w') to get your own file pointer
+	 * or let this do it for you.  When passing in a file pointer, this
+	 * method does not close the file; it only writes data.
+	 *
+	 * This can work better than inputData() when you are handling large
+	 * amounts of data.
+	 *
+	 * @param $file File pointer or filename
+	 * @return string
+	 */
+	public function inputDataToFile($file) {
+		$opened = false;
+
+		if (is_string($file)) {
+			$file = fopen($file, 'w');
+			$opened = true;
+		}
+
+		$fp = fopen('php://input', 'r');
+
+		while ($moreData = fread($fp, 8192)) {
+			fwrite($fp, $moreData);
+		}
+
+		fclose($fp);
+
+		if ($opened) {
+			fclose($file);
+		}
+
+		return $data;
+	}
+
+	/**
 	 * Returns true if the request is a GET
 	 *
 	 * @return boolean
@@ -171,6 +222,15 @@ class WebRequest {
 	 */
 	public function isPost() {
 		return 'POST' == $this->method();
+	}
+
+	/**
+	 * Returns true if the request is a PUT
+	 *
+	 * @return boolean
+	 */
+	public function isPut() {
+		return 'PUT' == $this->method();
 	}
 
 	/**
