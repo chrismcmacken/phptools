@@ -320,7 +320,7 @@ EOF;
 			),
 			'xml, simple' => array(
 				'<html><head></head><body></body></html>',
-				"<?xml version=\"1.0\"?>\n<html>\n  <head/>\n  <body/>\n</html>\n",
+				"<?xml version=\"1.0\"?" . ">\n<html>\n  <head/>\n  <body/>\n</html>\n",
 			),
 		);
 	}
