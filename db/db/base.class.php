@@ -908,12 +908,9 @@ abstract class DB_Base {
 
 			case DB_Fragment::NOW:
 				return 'NOW()';
-			
-			default:
-				throw new Exception('Fragment ' . $fragment . ' is not allowed to be used stand-alone.');
 		}
 
-		throw new Exception('Unhandled fragment: ' . $fragment->getType());
+		throw new Exception('Fragment ' . $fragment . ' is not allowed to be used stand-alone.');
 	}
 
 
