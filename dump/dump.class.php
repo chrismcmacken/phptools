@@ -712,6 +712,7 @@ function dumpToggle(o) {
 		$this->collapseStart($tag);
 		$this->span('string', $out);
 		$this->collapseEnd($alternate);
+		return $out;
 	}
 
 
