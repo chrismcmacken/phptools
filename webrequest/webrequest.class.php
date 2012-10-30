@@ -247,6 +247,62 @@ class WebRequest {
 	}
 
 	/**
+	 * Parses a query string, like what PHP's parse_str() method does.
+	 *
+	 * POST data is sent to the input (see inputData()) encoded this way,
+	 * as is GET data on the URL.
+	 *
+	 * This method differs from parse_str() in that it always returns an
+	 * array and that it does not convert spaces and dots in the names
+	 * into underscores.
+	 *
+	 * @param string $query
+	 * @return array
+	 */
+	public function parseQueryString($query) {
+		$result = array();
+		$pairs = explode('&', $query);
+
+		foreach ($pairs as $pair) {
+			$kv = explode('=', $pair, 2);
+			$name = urldecode($kv[0]);
+
+			if (count($kv) > 1) {
+				$value = urldecode($kv[1]);
+			} else {
+				$value = '';  // Matches PHP's parsing
+			}
+
+			// PHP's "[]" notation on names indicating an array
+			if (substr($name, -2) === '[]') {
+				// Remove the notation
+				$name = substr($name, 0, -2);
+			
+				// Force the result for this to be an array
+				// If it already exists, it will change into an array
+				// automatically just below
+				if (! array_key_exists($name, $result)) {
+					$result[$name] = array();
+				}
+			}
+
+			// Standard CGI practice makes an array if we specify the same
+			// name more than once
+			if (array_key_exists($name, $result)) {
+				if (! is_array($result[$name])) {
+					$result[$name] = (array) $result[$name];
+				}
+
+				$result[$name][] = $value;
+			} else {
+				$result[$name] = $value;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Return a single post value or all posted values
 	 *
 	 * @param string $name optional
