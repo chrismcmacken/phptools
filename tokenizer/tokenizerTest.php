@@ -42,13 +42,13 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function getTestsFromDirectory($dir) {
-		$files = glob($dir . '/*.php');
+		$files = glob($dir . '/*_php');
 		$tests = array();
 
 		foreach ($files as $inputFile) {
 			$outputFile = $inputFile;
-			$outputFile = substr($outputFile, 0, -3);
-			$outputFile .= 'txt';
+			$outputFile = substr($outputFile, 0, -4);
+			$outputFile .= '.txt';
 			$test = array(
 				$inputFile,
 				$outputFile,
