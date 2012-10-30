@@ -55,7 +55,7 @@
  */
 
 class TokenizerToken {
-	const EXCEPTION_PROPERTY = 608027;
+	const EXCEPTION_PROPERTY = 608027;  // Random number, but unchanging
 	protected $type;  // Token constant
 	protected $content;  // Content from PHP source file
 	protected $line;  // Line number
@@ -200,10 +200,23 @@ class TokenizerToken {
 	}
 
 
+	/**
+	 * Returns the line number for this token
+	 *
+	 * @return integer
+	 */
 	public function getLine() {
 		return $this->line;
 	}
 
+
+	/**
+	 * Gets the name of the token or UNKNOWN(xyz) if the token is unknown.
+	 * The xyz is replaced with the string or number representing the token
+	 * type.
+	 *
+	 * @return string
+	 */
 	public function getName() {
 		$type = $this->type;
 
@@ -221,6 +234,12 @@ class TokenizerToken {
 	}
 
 
+	/**
+	 * Returns the type of the token.  For built-in tokens, this is an
+	 * integer.  For custom ones, this is a string.
+	 *
+	 * @return string|integer
+	 */
 	public function getType() {
 		return $this->type;
 	}
