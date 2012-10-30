@@ -63,7 +63,7 @@ class DB_Fluent {
 	 * @return string
 	 */
 	public function __toString() {
-		return __CLASS__ . '(' . $this->db->toString() . ')';
+		return __CLASS__ . '(' . $this->db->__toString() . ')';
 	}
 
 
@@ -167,7 +167,7 @@ class DB_Fluent {
 	public function one() {
 		$o = $this->options;
 		$this->options['one'] = true;
-		$result = $this->result;
+		$result = $this->result();
 		$this->options = $o;
 		return $result;
 	}
@@ -203,7 +203,7 @@ class DB_Fluent {
 	public function sql() {
 		$o = $this->options;
 		$this->options['sql'] = true;
-		$result = $this->result;
+		$result = $this->result();
 		$this->options = $o;
 		return $result;
 	}

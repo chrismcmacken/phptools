@@ -78,6 +78,7 @@ class DependencyInjectionContainer {
 	 *
 	 * @param string $id
 	 * @return mixed
+	 * @throws InvalidArgumentException When the value isn't defined
 	 */
 	public function __get($id) {
 		if (! isset($this->values[$id])) {

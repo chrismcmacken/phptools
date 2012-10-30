@@ -151,11 +151,12 @@ class Dump {
 		}
 
 		$out .= ' function ' . $method->name . '(' . implode(', ', $parameters) . ')';
+		return $out;
 	}
 
 
 	/**
-	 * Finish a collapseable section
+	 * Finish a collapsable section
 	 *
 	 * @param string|null $contentHtml HTML to show in the alternate area
 	 */
@@ -173,7 +174,7 @@ class Dump {
 
 
 	/**
-	 * Start a collapseable section
+	 * Start a collapsable section
 	 *
 	 * @param string $tag Text to show in tag
 	 * @param boolean $expanding If false, show tag.  If true, show link
@@ -253,7 +254,6 @@ class Dump {
 	 */
 	protected function dumpRecursive($traversed) {
 		$out = 'RECURSIVE(';
-		$lastType = null;
 		
 		foreach ($traversed as $entry) {
 			if ($entry[0] == 'object') {
@@ -263,7 +263,6 @@ class Dump {
 			} else {
 				$out .= $entry[2];
 			}
-			$lastType = $entry[0];
 		}
 
 		$out .= ')';
@@ -371,7 +370,7 @@ function dumpToggle(o) {
 				}
 
 				if (! method_exists($prop, 'setAccessible')) {
-					// Reflection setAccessable was added in 5.3.0
+					// Reflection setAccessible was added in 5.3.0
 					if (is_null($accessibleClassVars)) {
 						$accessibleClass = $this->getStaticAccessibleClass($what);
 						$accessibleClassVars = $accessibleClass->____getObjectVars();
@@ -579,8 +578,9 @@ function dumpToggle(o) {
 	/**
 	 * Does the common bit of dumping a __set_state call to an object
 	 *
+	 * @param mixed $what
 	 * @param string $className
-	 * @param array $what
+	 * @param array $data
 	 */
 	protected function helperObjectSetState($what, $className, $data) {
 		static $varTypes = array(
@@ -636,7 +636,7 @@ function dumpToggle(o) {
 		$out = 'null /* resource(' . intval($what) . ', ' . $type;
 
 		if ($type == 'stream') {
-			$meta = stream_get_meta_data($data);
+			$meta = stream_get_meta_data($what);
 			
 			if (isset($meta['uri'])) {
 				$out .= ', "' . $meta['uri'] . '"';
@@ -1011,7 +1011,7 @@ function dumpToggle(o) {
 	protected function span($class, $data, $silent = false) {
 		if (! $silent) {
 			if ($this->htmlFlag) {
-				echo '<span class="dump_' . $class . '">' . htmlspecialchars($data) . '</span>';
+				echo '<span class="dump_' . $class . '">' . htmlentities($data) . '</span>';
 			} else {
 				echo $data;
 			}

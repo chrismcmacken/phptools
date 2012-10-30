@@ -149,6 +149,8 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * Increment our index and return the new current token, skipping ones
 	 * that are not important
 	 *
+	 * @param integer $increment How far to move
+	 * @param integer $startAt Can pick a different token index as a start
 	 * @return array|null Null if no more tokens
 	 */
 	public function getImportantTokenIndex($increment, $startAt = null) {
@@ -474,7 +476,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @throws ErrorException Every Time
 	 */
 	public function offsetSet($offset, $value) {
-		throw new ErrorException('Tokenizer objects are read only', static::EXCEOPTION_OFFSETSET);
+		throw new ErrorException('Tokenizer objects are read only', static::EXCEPTION_OFFSETSET);
 	}
 
 
@@ -485,10 +487,11 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 *
 	 * Used by the ArrayAccess interface
 	 *
+	 * @param integer $offset Unused
 	 * @throws ErrorException Every Time
 	 */
 	public function offsetUnset($offset) {
-		throw new ErrorException('Tokenizer objects are read only', static::EXCEOPTION_OFFSETUNSET);
+		throw new ErrorException('Tokenizer objects are read only', static::EXCEPTION_OFFSETUNSET);
 	}
 
 

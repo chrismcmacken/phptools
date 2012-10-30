@@ -32,6 +32,8 @@
  acknowledgments.
  */
 
+require_once(__DIR__ . '/db/base.class.php');
+require_once(__DIR__ . '/db/fluent.class.php');
 require_once(__DIR__ . '/db/fragment.class.php');
 require_once(__DIR__ . '/db/result.class.php');
 
@@ -60,6 +62,10 @@ class DB {
 	 *
 	 * @param string $uri DB connection string
 	 * @return DB_Base Database object
+	 * @throws Exception No schema specified
+	 * @throws Exception Invalid schema specified
+	 * @throws Exception Handle class was not loaded
+	 * @throws Exception Result class was not loaded
 	 */
 	static public function connect($uri) {
 		$components = parse_url($uri);
@@ -110,6 +116,7 @@ class DB {
 	/**
 	 * Return the "greater than" database fragment
 	 *
+	 * @param mixed $value
 	 * @return DB_Fragment GT
 	 */
 	static public function gt($value) {
@@ -121,6 +128,7 @@ class DB {
 	/**
 	 * Return the "greater than or equal to" database fragment
 	 *
+	 * @param mixed $value
 	 * @return DB_Fragment GTE
 	 */
 	static public function gte($value) {
@@ -132,6 +140,7 @@ class DB {
 	/**
 	 * Return the "like" database fragment
 	 *
+	 * @param mixed $value
 	 * @return DB_Fragment LIKE
 	 */
 	static public function like($value) {
@@ -143,6 +152,7 @@ class DB {
 	/**
 	 * Return the "less than" database fragment
 	 *
+	 * @param mixed $value
 	 * @return DB_Fragment LT
 	 */
 	static public function lt($value) {
@@ -154,6 +164,7 @@ class DB {
 	/**
 	 * Return the "less than or equal to" database fragment
 	 *
+	 * @param mixed $value
 	 * @return DB_Fragment LTE
 	 */
 	static public function lte($value) {

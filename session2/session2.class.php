@@ -120,7 +120,6 @@ class Session2 {
 		session_unset();
 		session_destroy();
 		$this->removeHeaders();
-		$sessionCookieHeader = 'Set-Cookie: ' . session_name() . '=';
 		setcookie(session_name(), "", 1, ini_get('session.cookie_path'), ini_get('session.cookie_domain'), ini_get('session.cookie_secure'), ini_get('session.cookie_httponly'));
 	}
 

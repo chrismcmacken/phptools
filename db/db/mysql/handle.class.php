@@ -135,8 +135,8 @@ class DB_Mysql_Handle extends DB_Base {
 	 * Restrict the result set to a number of rows or remove the restriction
 	 *
 	 * @param string $sql Current SQL command
-	 * @param integer $max Maximum number of rows
-	 * @param integer $offset Starting row number
+	 * @param false|integer $max Maximum number of rows
+	 * @param false|integer $offset Starting row number
 	 * @return string Modified SQL command
 	 */
 	public function limit($sql, $max = false, $offset = false) {
@@ -158,9 +158,20 @@ class DB_Mysql_Handle extends DB_Base {
 
 
 	/**
+	 * Creates a result object
+	 *
+	 * @param string $sql
+	 */
+	protected function resultObject($sql) {
+		return new DB_Mysql_Result($sql, $this->connection);
+	}
+
+
+	/**
 	 * Escape a table name and probably prefix it
 	 *
 	 * @param string $table Unescaped table name
+	 * @param boolean $prefix True if the table name should be prefixed
 	 * @return string Escaped table name
 	 */
 	public function tableName($table, $prefix = true) {

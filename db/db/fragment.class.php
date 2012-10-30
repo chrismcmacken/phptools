@@ -55,6 +55,8 @@ class DB_Fragment {
 	 * Creates a new DB Fragment
 	 *
 	 * @param string $fragmentType See defined constants
+	 * @param mixed $args Arguments to pass around - available via getArgs()
+	 * @throws Exception Invalid fragment type
 	 */
 	public function __construct($fragmentType, $args = null) {
 		switch ($fragmentType) {

@@ -110,7 +110,9 @@ class TokenizerToken {
 	/**
 	 * Create a Tokenizer object from a list of tokens
 	 *
-	 * @param array $tokens Token list from token_get_all()
+	 * @param integer|string $type Integer token constant or string of content
+	 * @param string $content Content of token
+	 * @param integer $line Line number
 	 */
 	protected function __construct($type, $content, $line) {
 		$this->type = $type;

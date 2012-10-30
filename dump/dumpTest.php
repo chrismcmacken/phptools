@@ -110,6 +110,7 @@ EOF;
 	 *
 	 * @param string $class
 	 * @param string $content
+	 * @param boolean $escape True if content should be escaped
 	 * @return string
 	 */
 	public function span($class, $content, $escape = true) {
@@ -150,6 +151,7 @@ EOF;
 	 * Do a key span and an operator span for the key of an array
 	 *
 	 * @param name $key
+	 * @param string $objectProtection Name for object
 	 * @return string
 	 */
 	public function spanKey($key, $objectProtection = null) {

@@ -40,7 +40,8 @@ class DB_Sqlite_Handle extends DB_Base {
 	 * Make the connection to the database
 	 *
 	 * @param array $components Results of parse_url()
-	 * @throws Exception
+	 * @throws Exception SQLite functions are not enabled
+	 * @throws Exception Error connecting to the database
 	 */
 	public function __construct($components) {
 		parent::__construct($components);
@@ -117,6 +118,7 @@ class DB_Sqlite_Handle extends DB_Base {
 	 * @param string $field Field name
 	 * @param mixed $options Additional options (see base's parseOptions())
 	 * @return boolean|string True if field exists or SQL string
+	 * @throws Exception Always - this is not implemented
 	 */
 	public function fieldExists($table, $field, $options = false) {
 		throw new Exception('fieldExists is not implemented');
@@ -144,8 +146,8 @@ class DB_Sqlite_Handle extends DB_Base {
 	 * Restrict the result set to a number of rows or remove the restriction
 	 *
 	 * @param string $sql Current SQL command
-	 * @param integer $max Maximum number of rows
-	 * @param integer $offset Starting row number
+	 * @param false|integer $max Maximum number of rows
+	 * @param false|integer $offset Starting row number
 	 * @return string Modified SQL command
 	 */
 	public function limit($sql, $max = false, $offset = false) {
@@ -167,9 +169,20 @@ class DB_Sqlite_Handle extends DB_Base {
 
 
 	/**
+	 * Creates a result object
+	 *
+	 * @param string $sql
+	 */
+	protected function resultObject($sql) {
+		return new DB_Sqlite_Result($sql, $this->connection);
+	}
+
+
+	/**
 	 * Escape a table name and probably prefix it
 	 *
 	 * @param string $table Unescaped table name
+	 * @param boolean $prefix True if the table name should be prefixed
 	 * @return string Escaped table name
 	 */
 	public function tableName($table, $prefix = true) {
@@ -189,6 +202,7 @@ class DB_Sqlite_Handle extends DB_Base {
 	 * @param string $table Name of table
 	 * @param mixed $options Additional options
 	 * @return boolean True if table exists
+	 * @throws Exception Always - this is not implemented
 	 */
 	public function tableExists($table, $options = false) {
 		throw new Exception('tableExists() is not yet implemented');

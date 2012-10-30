@@ -91,6 +91,16 @@ abstract class DB_Base {
 
 
 	/**
+	 * Convert the db class into a string.
+	 *
+	 * @return string
+	 */
+	public function __toString() {
+		return __CLASS__;
+	}
+
+
+	/**
 	 * Signify a switch of databases.  Does not actually change databases.
 	 * Instead, that is done at the beginning of query() with
 	 * dbSwitchIfNeeded().
@@ -250,7 +260,6 @@ abstract class DB_Base {
 	 *
 	 * @param string $table Table name
 	 * @param string $field Field name
-	 * @param mixed $options Additional options
 	 * @return boolean|string True if field exists or generated SQL
 	 */
 	abstract public function fieldExists($table, $field);
@@ -429,7 +438,8 @@ abstract class DB_Base {
 	 *    sql - Return SQL string
 	 *
 	 * @param string $sql
-	 * @return boolean True on success
+	 * @param mixed $options Additional options
+	 * @return DB_Result|array True on success
 	 */
 	public function query($sql, $options = null) {
 		$options = $this->parseOptions($options);
@@ -453,10 +463,7 @@ abstract class DB_Base {
 		}
 
 		$this->dbSwitchIfNeeded();
-		$resultClass = get_class($this);
-		$resultClass = substr($resultClass, 0, -7);
-		$resultClass .= '_Result';
-		$result = new $resultClass($this->connection, $sql);
+		$result = $this->resultObject($sql);
 		
 		if (isset($options['one'])) {
 			return $result->fetch();
@@ -474,6 +481,19 @@ abstract class DB_Base {
 	 */
 	public function quote($in) {
 		return '"' . addslashes($in) . '"';
+	}
+
+
+	/**
+	 * Get a generic result object
+	 *
+	 * @param string $sql
+	 */
+	protected function resultObject($sql) {
+		$resultClass = get_class($this);
+		$resultClass = substr($resultClass, 0, -7);
+		$resultClass .= '_Result';
+		$result = new $resultClass($sql);
 	}
 
 
@@ -561,6 +581,7 @@ abstract class DB_Base {
 	 * @param mixed $group Single grouping condition or array of conditions
 	 * @param mixed $having Single where clause or array of clauses
 	 * @return mixed Results object or SQL string
+	 * @throws Exception When $from is undefined - you need a table
 	 */
 	public function select($fields, $from = false, $where = false, $order = false, $options = false, $group = false, $having = false) {
 		$sql = 'SELECT';
@@ -758,6 +779,7 @@ abstract class DB_Base {
 	 * Escape a table name and probably prefixes it
 	 *
 	 * @param string $table Unescaped table name
+	 * @param boolean $prefix If true, add the prefix to this table name
 	 * @return string Escaped table name
 	 */
 	public function tableName($table, $prefix = true) {
@@ -823,7 +845,14 @@ abstract class DB_Base {
 	}
 
 
-	public function toSqlValueInList($list, $key) {
+	/**
+	 * Convert an array into a list
+	 *
+	 * @param array $list
+	 * @param string $key
+	 * @return string SQL
+	 */
+	public function toSqlValueInList($list, $key = null) {
 		$out = array();
 		
 		foreach ($list as $singleValue) {
@@ -840,11 +869,24 @@ abstract class DB_Base {
 	}
 
 
+	/**
+	 * Change a DateTime object into the right format for this DB
+	 *
+	 * @param DateTime $dateTime
+	 * @return string SQL
+	 */
 	public function sqlFromDateTime($dateTime) {
 		return $this->quote($dateTime->format('Y-m-d H:i:s'));
 	}
 
 
+	/**
+	 * Convert a DB fragment into the right bit of a query
+	 *
+	 * @param DB_Fragment $fragment
+	 * @param string $key Name for the field
+	 * @return string
+	 */
 	protected function sqlFromFragment($fragment, $key) {
 		$prefixDefault = '';
 	
@@ -925,6 +967,7 @@ abstract class DB_Base {
 	 * @param mixed $where Single condition or array of conditions
 	 * @param mixed $options Additional options
 	 * @return mixed Number of rows affected or false on error
+	 * @throws Exception When $what is an array that's empty
 	 */
 	public function update($table, $what, $where = null, $options = false) {
 		$options = $this->parseOptions($options);

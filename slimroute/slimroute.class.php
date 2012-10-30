@@ -51,7 +51,7 @@ abstract class SlimRoute {
 	 * Create a new controller
 	 *
 	 * @param string $uri URI that's left for processing - you shouldn't need it
-	 * @param WebRequest $request Where one can get POST/GET/etc
+	 * @param SlimRoute $parent Parent route
 	 */
 	public function __construct($uri = null, $parent = null) {
 		if (is_null($parent)) {
@@ -104,7 +104,6 @@ abstract class SlimRoute {
 	 * Look up the right controller, then call handle* method (where
 	 * GET requests use handleGet, etc) if it exists, then call render().
 	 *
-	 * @param $request Request object
 	 * @return mixed
 	 */
 	public function handle() {
@@ -117,28 +116,48 @@ abstract class SlimRoute {
 
 
 	/**
-	 * Null functions that you are supposed to override when needed
+	 * Null functions that you are supposed to override when needed.
+	 *
+	 * @throws Exception Always - this method should be overridden
 	 */
 	protected function handleDelete() {
 		throw new Exception('This page did not render content.');
 	}
 
 
+	/**
+	 * Null functions that you are supposed to override when needed.
+	 *
+	 * @throws Exception Always - this method should be overridden
+	 */
 	protected function handleGet() {
 		throw new Exception('This page did not render content.');
 	}
 
 
+	/**
+	 * Null functions that you are supposed to override when needed
+	 * By default, change HEAD into GET.
+	 */
 	protected function handleHead() {
 		return $this->handleGet();
 	}
 
 
+	/**
+	 * Null functions that you are supposed to override when needed.
+	 * By default, change POST into GET.
+	 */
 	protected function handlePost() {
 		return $this->handleGet();
 	}
 
 
+	/**
+	 * Null functions that you are supposed to override when needed.
+	 *
+	 * @throws Exception Always - this method should be overridden
+	 */
 	protected function handlePut() {
 		throw new Exception('This page did not render content.');
 	}
@@ -232,8 +251,10 @@ abstract class SlimRoute {
 	 * @return string Absolute URL
 	 */
 	public function url($relativePath) {
+		$uri = $relativePath;
+
 		// Make the link absolute
-		if (substr($relativePath, 0, 1) != '/') {
+		if (substr($uri, 0, 1) != '/') {
 			$controller = $this->getController();
 			$parent = $controller->parent;
 
@@ -241,8 +262,6 @@ abstract class SlimRoute {
 				$currentUri = $parent->getUri();
 				$uri = $currentUri . '/' . $relativePath;
 			}
-		} else {
-			$uri = $relativePath;
 		}
 
 		$uri = preg_replace('~[^/]*/\\.\\./~', '/', $uri);

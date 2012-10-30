@@ -85,7 +85,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 		$expected = file_get_contents($tokenFile);
 		$actual = '';
 
-		foreach ($tokenizer as $key => $token) {
+		foreach ($tokenizer as $token) {
 			$line = array(
 				$token->name,
 				$token->line,

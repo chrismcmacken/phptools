@@ -41,7 +41,6 @@
 
 abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 	protected $columns = array();  // Array of fieldName => dataType
-	protected $connection = null;  // DB connection
 	protected $index = null;  // Current index (0 <= index < indexMax)
 	protected $indexMax = null;  // Highest row number
 	protected $keyColumn = null;  // Key column for iterating
@@ -55,13 +54,11 @@ abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 	 *
 	 * Throw an exception on error
 	 *
-	 * If possible, write a desctructor to free the result set
+	 * If possible, write a destructor to free the result set
 	 *
-	 * @param resource $connection DB connection
 	 * @param string $sql
 	 */
-	public function __construct($connection, $sql) {
-		$this->connection = $connection;
+	public function __construct($sql) {
 		$this->sql = $sql;
 	}
 
@@ -186,6 +183,7 @@ abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @param string $keyColumn Column name to use as the key
 	 * @return array Array of row arrays
+	 * @throws Exception Error using itself as ArrayAccess or Iterator
 	 */
 	public function fetchAll($keyColumn = null) {
 		if (! is_null($keyColumn)) {
@@ -219,6 +217,7 @@ abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 	 *
 	 * @param string $keyColumn Column name
 	 * @return array All of the values from the one column in the result set
+	 * @throws Exception Error using itself as ArrayAccess or Iterator
 	 */
 	public function fetchColumn($keyColumn) {
 		$this->checkColumnExists($keyColumn);
@@ -227,7 +226,7 @@ abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 		$out = array();
 		try {
 			foreach ($this as $key => $row) {
-				$out[] = $row[$column];
+				$out[] = $key;
 			}
 		} catch (Exception $ex) {
 			$this->keyColumn = $oldKeyColumn;
@@ -342,7 +341,7 @@ abstract class DB_Result implements ArrayAccess, Iterator, Countable {
 	 * Return true if the row exists
 	 *
 	 * @param mixed $offset Row number
-	 * @return bolean
+	 * @return boolean
 	 */
 	public function offsetExists($offset) {
 		settype($offset, 'integer');

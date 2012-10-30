@@ -37,6 +37,7 @@
  */
 
 class DB_Mysql_Result extends DB_Result {
+	protected $connection = null;
 	protected $resource = null;
 
 	/**
@@ -46,8 +47,9 @@ class DB_Mysql_Result extends DB_Result {
 	 * @param string $sql
 	 * @throws Exception MySQL error
 	 */
-	public function __construct($connection, $sql) {
-		parent::__construct($connection, $sql);
+	public function __construct($sql, $connection) {
+		parent::__construct($sql);
+		$this->connection = $connection;
 		$resource = mysql_query($sql, $this->connection);
 
 		if (false === $resource) {

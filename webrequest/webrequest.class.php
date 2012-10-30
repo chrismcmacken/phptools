@@ -126,11 +126,11 @@ class WebRequest {
 	 */
 	public function file($name = null) {
 		if (is_null($name)) {
-			return $this->file;
+			return $this->files;
 		}
 
-		if (array_key_exists($name, $this->file)) {
-			return $this->file[$name];
+		if (array_key_exists($name, $this->files)) {
+			return $this->files[$name];
 		}
 
 		return null;
@@ -463,13 +463,14 @@ class WebRequest {
 		}
 
 		// This method should not be passed to PHP
-		throw new ErrorException('Invalid method: ' + $this->method());
+		throw new ErrorException('Invalid method: ' . $this->method());
 	}
 
 
 	/**
 	 * Returns the URI for the current script
 	 *
+	 * @param string $queryString Query string to use instead of detecting one
 	 * @return string
 	 */
 	public function uri($queryString = true) {

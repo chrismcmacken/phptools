@@ -37,17 +37,20 @@
  */
 
 class DB_Sqlite_Result extends DB_Result {
+	protected $connection = null;
 	protected $resource = null;
 
 	/**
 	 * Run a query
 	 *
-	 * @param resource $connection DB Connection
 	 * @param string $sql
+	 * @param resource $connection DB Connection
 	 * @throws Exception MySQL error
 	 */
-	public function __construct($connection, $sql) {
-		parent::__construct($connection, $sql);
+	public function __construct($sql, $connection) {
+		parent::__construct($sql);
+		$this->connection = $connection;
+		$errorMessage = ''; // Overwritten by sqlite_query
 		$resource = sqlite_query($this->connection, $sql, SQLITE_ASSOC, $errorMessage);
 
 		if (false === $resource) {

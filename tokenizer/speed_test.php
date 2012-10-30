@@ -72,7 +72,7 @@ function testFindRepeatSetup() {
 }
 
 function testTokenize() {
-	$tokenizer = Tokenizer::tokenizeFile('big_file.php');
+	Tokenizer::tokenizeFile('big_file.php');
 }
 
 
