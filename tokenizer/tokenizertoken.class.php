@@ -200,6 +200,10 @@ class TokenizerToken {
 	}
 
 
+	public function getLine() {
+		return $this->line;
+	}
+
 	public function getName() {
 		$type = $this->type;
 

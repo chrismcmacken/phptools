@@ -385,7 +385,7 @@ class Tokenizer implements ArrayAccess, Iterator {
 	 * @param TokenizerMatchStack $phpStack
 	 */
 	protected function matchInvalid($key, $token, $stack, $phpStack) {
-		$this->setReason('T_BAD_CHARACTER encountered on line ' . $token->line);
+		$this->setReason('T_BAD_CHARACTER encountered on line ' . $token->getLine());
 	}
 
 
