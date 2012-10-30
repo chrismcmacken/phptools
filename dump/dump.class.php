@@ -735,7 +735,7 @@ function dumpToggle(o) {
 	 * @return string HTML
 	 */
 	public function htmlSafeText($text) {
-		$html = htmlspecialchars($text);
+		$html = htmlentities($text);
 		$html = nl2br($html);
 		$html = str_replace("\t", ' &nbsp; &nbsp; &nbsp; &nbsp;', $html);
 		return $html;

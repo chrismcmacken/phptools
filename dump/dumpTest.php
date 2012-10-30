@@ -114,7 +114,7 @@ EOF;
 	 */
 	public function span($class, $content, $escape = true) {
 		if ($escape) {
-			$content = htmlspecialchars($content);
+			$content = htmlentities($content);
 		}
 
 		return '<span class="dump_' . $class . '">' . $content . '</span>';
@@ -304,7 +304,7 @@ EOF;
 		$string = $matches[1];
 		$string = str_replace("&nbsp; &nbsp; &nbsp; &nbsp; ", "\t", $string);
 		$string = str_replace("<br />\n", "\n", $string);
-		$string = htmlspecialchars_decode($string);
+		$string = html_entity_decode($string);
 		$this->assertEquals($out, $string, 'Specially formatted string does not match');
 	}
 
