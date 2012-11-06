@@ -8,8 +8,7 @@
  *   $builder->addFile('README.txt', '/tmp/README.txt');
  *   $builder->addDir('docs');
  *   $builder->addFileData('docs/LICENSE', 'This has no license');
- *   $builder->outputToBrowserHeaders();
- *   $builder->outputToBrowser();
+ *   $builder->outputToBrowser('target.zip');
  *
  * Based on the following works:
  *
@@ -175,6 +174,25 @@ class ZipBuilder {
 			header("Content-Disposition: attachment; filename=\"$zipname\"");
 			header("Content-Type: application/zip; name=\"$zipname\"");
 		}
+	}
+
+
+	/**
+	 * Write the file out to a browser
+	 *
+	 * @param string $filename
+	 * @param boolean $outputHeaders If true, sends headers (optional)
+	 */
+	public function outputToBrowser($filename, $outputHeaders = true) {
+		if ($outputHeaders) {
+			if (! headers_sent()) {
+				$this->outputToBrowserHeaders($filename);
+			}
+		}
+
+		$this->write(function ($data) {
+			echo $data;
+		});
 	}
 
 
