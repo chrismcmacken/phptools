@@ -18,6 +18,7 @@ spl_autoload_register(function ($name) {
 		'ultralite',
 		'variablestream',
 		'webrequest',
+		'zipbuilder',
 	);
 
 	foreach ($paths as $path) {
