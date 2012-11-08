@@ -53,7 +53,7 @@ class ZipBuilder {
 			$name .= '/';
 		}
 
-		$entries[] = array(
+		$this->entries[] = array(
 			'type' => 'directory',
 			'name' => $name,
 			'timestamp' => $time
@@ -70,14 +70,14 @@ class ZipBuilder {
 	 * @param string $realName Actual filename on disk
 	 * @param integer $timestamp Override file timestamp (Unix timestamp, optional)
 	 */
-	public function addFile($data, $realName = null, $time = null) {
+	public function addFile($name, $realName = null, $time = null) {
 		if ($realName === null) {
-			$realName = name;
+			$realName = $name;
 		}
 
 		$name = str_replace('\\', '/', $name);
 		
-		$entries[] = array(
+		$this->entries[] = array(
 			'type' => 'file',
 			'name' => $name,
 			'realName' => $realName,
@@ -133,7 +133,7 @@ class ZipBuilder {
 		$name = str_replace('\\', '/', $name);
 		$compressedData = gzdeflate($data, 9);
 
-		$entries[] = array(
+		$this->entries[] = array(
 			'type' => 'data',
 			'name' => $name,
 			'timestamp' => $time,
@@ -165,14 +165,14 @@ class ZipBuilder {
 			$badIE = 1;
 		}
 		
-		$zipname = ereg_replace('[^-a-zA-Z0-9\.]', '_', $zipname);
+		$zipName = preg_replace('/[^-a-zA-Z0-9\.]/', '_', $zipName);
 		
 		if ($badIE) {
-			header("Content-Disposition: inline; filename=$zipname");
-			header("Content-Type: application/zip; name=\"$zipname\"");
+			header("Content-Disposition: inline; filename=$zipName");
+			header("Content-Type: application/zip; name=\"$zipName\"");
 		} else {
-			header("Content-Disposition: attachment; filename=\"$zipname\"");
-			header("Content-Type: application/zip; name=\"$zipname\"");
+			header("Content-Disposition: attachment; filename=\"$zipName\"");
+			header("Content-Type: application/zip; name=\"$zipName\"");
 		}
 	}
 
@@ -224,19 +224,20 @@ class ZipBuilder {
 		}
 
 
-		// Bytes:  YYYY YYYM MMMD DDDD  HHHH HMMM MMSS SSSS
+		// Bits:  YYYY YYYM MMMD DDDD  HHHH HMMM MMSS SSSS
 		//   Y = Years from 1980
 		//   M = Month (1 - 12)
 		//   D = Day (1 - 31)
 		//   H = Hour (24 hour)
 		//   M = Minute (0 - 60)
 		//   S = Seconds (actually seconds >> 1 to drop the odd second bit)
-		$bytes = '';
-		$bytes .= chr((($timeArray['year'] - 1980 << 1) | ($timeArray['mon'] >> 3)) & 0xFF);
-		$bytes .= chr((($timeArray['mon'] << 5) | $timeArray['mday']) & 0xFF);
-		$bytes .= chr((($timeArray['hours'] << 3) | ($timeArray['minutes'] >> 2)) & 0xFF);
-		$bytes .= chr((($timeArray['minutes'] << 6) | ($timeArray['seconds'] >> 1)) & 0xFF);
-		return $bytes;
+		$ymd = ($timeArray['year'] - 1980) << 9;
+		$ymd += $timeArray['mon'] << 5;
+		$ymd += $timeArray['mday'];
+		$hms = $timeArray['hours'] << 11;
+		$hms += $timeArray['minutes'] << 6;
+		$hms += $timeArray['seconds'] >> 1;
+		return pack('v', $hms) . pack('v', $ymd);
 	}
 
 
@@ -249,7 +250,7 @@ class ZipBuilder {
 		$directory = array();
 		$offset = 0;
 
-		$writeData = function ($data) use ($data, &$offset) {
+		$writeChunk = function ($data) use ($callback, &$offset) {
 			$offset += strlen($data);
 			$callback($data);
 		};
@@ -257,26 +258,22 @@ class ZipBuilder {
 		foreach ($this->entries as $entry) {
 			switch ($entry['type']) {
 				case 'data':
-					$directory[] = $this->writeData($entry, $offset, $writeData);
+					$directory[] = $this->writeData($entry, $offset, $writeChunk);
 					break;
 
 				case 'directory':
-					$directory[] = $this->writeDir($entry, $offset, $writeData);
+					$directory[] = $this->writeDir($entry, $offset, $writeChunk);
 					break;
 
 				case 'file':
 					$entry = $this->loadFile($entry);
-					$directory[] = $this->writeData($entry, $offset, $writeData);
+					$directory[] = $this->writeData($entry, $offset, $writeChunk);
 					break;
 
 
 				default:
 					throw new Exception('Unhandled entry type: ' . $entry['type']);
 			}
-		}
-
-		foreach ($directory as $entry) {
-			$callback($entry);
 		}
 
 		$footer = implode('', $directory);  // Control directory
@@ -315,7 +312,7 @@ class ZipBuilder {
 		$data .= $entry['name'];  // Filename
 		
 		// File data segment
-		$data .= $zdata;
+		$data .= $entry['compressedData'];
 		$dataCallback($data);
 		
 		// now add to central directory record
@@ -324,7 +321,7 @@ class ZipBuilder {
 		$directory .= "\x14\x00";  // Version needed to extract
 		$directory .= "\x00\x00";  // General purpose bit flag
 		$directory .= "\x08\x00";  // Compression method
-		$directory .= $hexdtime;  // Last modification time & date
+		$directory .= $this->unix2DosTime($entry['timestamp']);  // Last modification date and time
 		$directory .= pack('V', $entry['originalCrc']);  // CRC32
 		$directory .= pack('V', strlen($entry['compressedData']));  // Compressed filesize
 		$directory .= pack('V', $entry['originalSize']);  // Uncompressed filesize
@@ -365,7 +362,7 @@ class ZipBuilder {
 		$data .= pack('V', 0);
 		$data .= pack('V', 0);
 		$data .= pack('V', 0);
-		dataCallback($data);  // Also updates $offset
+		$dataCallback($data);  // Also updates $offset
 		$directory = "\x50\x4b\x01\x02";
 		$directory .= "\x00\x00";
 		$directory .= "\x0a\x00";
