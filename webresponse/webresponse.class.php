@@ -84,6 +84,12 @@ class WebResponse {
 		exit();
 	}
 
+	static public function showErrors() {
+		error_reporting(E_ALL | E_STRICT | E_NOTICE);
+		ini_set('display_errors', 'on');
+		ini_set('display_startup_errors', 'on');
+	}
+
 	static public function status($codeOrString) {
 		if (is_integer($codeOrString)) {
 			if (! empty(static::$statusCodes[$codeOrString])) {
