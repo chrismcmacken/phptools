@@ -1,7 +1,7 @@
 <?PHP
 
 class WebResponse {
-	public $statusCodes = array(
+	static public $statusCodes = array(
 		100 => 'Continue',
 		101 => 'Switching Protocols',
 		102 => 'Processing', // WebDAV
@@ -86,8 +86,8 @@ class WebResponse {
 
 	static public function status($codeOrString) {
 		if (is_integer($codeOrString)) {
-			if (! empty($this->statusCodes[$codeOrString])) {
-				$codeOrString = $codeOrString . ' ' . $this->statusCodes[$codeOrString];
+			if (! empty(static::$statusCodes[$codeOrString])) {
+				$codeOrString = $codeOrString . ' ' . static::$statusCodes[$codeOrString];
 			}
 		}
 
