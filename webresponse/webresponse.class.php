@@ -1,6 +1,10 @@
 <?PHP
 
+/**
+ * Respond to the client
+ */
 class WebResponse {
+	// HTTP status code to name mapping
 	static public $statusCodes = array(
 		100 => 'Continue',
 		101 => 'Switching Protocols',
@@ -77,19 +81,42 @@ class WebResponse {
 		599 => 'Network Connect Timeout Error', // Microsoft
 	);
 
+
+	/**
+	 * Utility function to just redirect the client and then leave.
+	 * Very simple, but also explicit.  It may amaze you how many people
+	 * will write a Location header but never call exit().
+	 *
+	 * @param string $uri
+	 */
 	static public function redirectAndExit($uri) {
 		if (! headers_sent()) {
 			header('Location: ' . $uri);
 		}
+
 		exit();
 	}
 
+
+	/**
+	 * Turn on error reporting.  You really don't want to do this often,
+	 * otherwise you may leak information to the client that they were not
+	 * supposed to have.
+	 */
 	static public function showErrors() {
 		error_reporting(E_ALL | E_STRICT | E_NOTICE);
 		ini_set('display_errors', 'on');
 		ini_set('display_startup_errors', 'on');
 	}
 
+
+	/**
+	 * Generate an HTTP status code.  Takes care of matching the responding
+	 * protocol version with what the client used in the request, and will
+	 * also add the status code's name when you pass in just a number
+	 *
+	 * @param mixed $codeOrString
+	 */
 	static public function status($codeOrString) {
 		if (is_integer($codeOrString)) {
 			if (! empty(static::$statusCodes[$codeOrString])) {
