@@ -1,6 +1,6 @@
 <?PHP
 /*
- Copyright (c) 2011 individual committers of the code
+ Copyright (c) 2012 individual committers of the code
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,18 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 				),
 				'loop.tpl',
 				"loop 1\nloop 2\nloop 3\nloop 4\n"
-			)
+			),
+			'class_properties_crlf' => array(
+				'Ultralite',
+				array(
+					'user' => (object) array(
+						'name' => 'Sir Henry',
+						'quest' => 'To run away',
+					),
+				),
+				'class_properties_crlf.tpl',
+				"Sample line 1\r\n\r\nWhat is your name?  Sir Henry\r\nWhat is your quest?  To run away\r\n\r\nFantastic!\r\n",
+			),
 		);
 	}
 

@@ -1,7 +1,7 @@
 <?php
 
 /*
- Copyright (c) 2011 individual committers of the code
+ Copyright (c) 2012 individual committers of the code
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -126,7 +126,7 @@ class Ultralite {
 
 			// {{$variable}} or {{function()}}
 			'/({{\s*(?:.*?)\s*}})\\n/' => '\\1<?php echo "\\n"; ?' . ">\n",
-			'/({{\s*(?:.*?)\s*}})\\r\\n/' => '\\1<?php echo "\\r\\n"; ?' . ">\r\\n",
+			'/({{\s*(?:.*?)\s*}})\\r\\n/' => '\\1<?php echo "\\r\\n"; ?' . ">\r\n",
 			'/({{\s*(?:.*?)\s*}})\\r/' => '\\1<?php echo "\\r"; ?' . ">\r",
 			'/{{\s*(.*?)\s*}}/' => '<?php $this->output(@ \\1); ?' . '>',
 
