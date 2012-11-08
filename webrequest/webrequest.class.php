@@ -243,6 +243,10 @@ class WebRequest {
 	 * @return string
 	 */
 	public function method() {
+		if (empty($_SERVER['REQUEST_METHOD'])) {
+			return null;
+		}
+
 		return strtoupper($_SERVER['REQUEST_METHOD']);
 	}
 
@@ -457,7 +461,8 @@ class WebRequest {
 			'GET',
 			'POST',
 			'PUT',
-			'DELETE'
+			'DELETE',
+			null // Default when called from CLI
 		))) {
 			return;
 		}
