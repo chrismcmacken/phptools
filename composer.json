@@ -35,24 +35,24 @@
 	},
 	"autoload": {
 		"classmap": [
-			"Cache/",
-			"Crypto/",
-			"DB/",
-			"DependencyInjectionContainer/",
-			"Dump/",
-			"Friend/",
-			"Logger/",
-			"PHPToolsTestBase/",
-			"Renamer/",
-			"Session2/",
-			"Skeleton/",
-			"SlimRoute/",
-			"Tokenizer/",
-			"Ultralite/",
-			"VariableStream/",
-			"WebRequest/",
-			"WebResponse/",
-			"ZipBuilder/"
+			"cache/",
+			"crypto/",
+			"db/",
+			"dependencyinjectioncontainer/",
+			"dump/",
+			"friend/",
+			"logger/",
+			"phptoolstestbase/",
+			"renamer/",
+			"session2/",
+			"skeleton/",
+			"slimroute/",
+			"tokenizer/",
+			"ultralite/",
+			"variablestream/",
+			"webrequest/",
+			"webresponse/",
+			"zipbuilder/"
 		]
 	}
 }
