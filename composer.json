@@ -35,24 +35,24 @@
 	},
 	"autoload": {
 		"classmap": [
-			"vendor/chrismcmacken/Cache/",
-			"vendor/chrismcmacken/Crypto/",
-			"vendor/chrismcmacken/DB/",
-			"vendor/chrismcmacken/DependencyInjectionContainer/",
-			"vendor/chrismcmacken/Dump/",
-			"vendor/chrismcmacken/Friend/",
-			"vendor/chrismcmacken/Logger/",
-			"vendor/chrismcmacken/PHPToolsTestBase/",
-			"vendor/chrismcmacken/Renamer/",
-			"vendor/chrismcmacken/Session2/",
-			"vendor/chrismcmacken/Skeleton/",
-			"vendor/chrismcmacken/SlimRoute/",
-			"vendor/chrismcmacken/Tokenizer/",
-			"vendor/chrismcmacken/Ultralite/",
-			"vendor/chrismcmacken/VariableStream/",
-			"vendor/chrismcmacken/WebRequest/",
-			"vendor/chrismcmacken/WebResponse/",
-			"vendor/chrismcmacken/ZipBuilder/"
+			"vendor/chrismcmacken/phptools/Cache/",
+			"vendor/chrismcmacken/phptools/Crypto/",
+			"vendor/chrismcmacken/phptools/DB/",
+			"vendor/chrismcmacken/phptools/DependencyInjectionContainer/",
+			"vendor/chrismcmacken/phptools/Dump/",
+			"vendor/chrismcmacken/phptools/Friend/",
+			"vendor/chrismcmacken/phptools/Logger/",
+			"vendor/chrismcmacken/phptools/PHPToolsTestBase/",
+			"vendor/chrismcmacken/phptools/Renamer/",
+			"vendor/chrismcmacken/phptools/Session2/",
+			"vendor/chrismcmacken/phptools/Skeleton/",
+			"vendor/chrismcmacken/phptools/SlimRoute/",
+			"vendor/chrismcmacken/phptools/Tokenizer/",
+			"vendor/chrismcmacken/phptools/Ultralite/",
+			"vendor/chrismcmacken/phptools/VariableStream/",
+			"vendor/chrismcmacken/phptools/WebRequest/",
+			"vendor/chrismcmacken/phptools/WebResponse/",
+			"vendor/chrismcmacken/phptools/ZipBuilder/"
 		]
 	}
 }
