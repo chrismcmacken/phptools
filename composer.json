@@ -35,24 +35,24 @@
 	},
 	"autoload": {
 		"classmap": [
-			"vendor/chrismcmacken/phptools/Cache/",
-			"vendor/chrismcmacken/phptools/Crypto/",
-			"vendor/chrismcmacken/phptools/DB/",
-			"vendor/chrismcmacken/phptools/DependencyInjectionContainer/",
-			"vendor/chrismcmacken/phptools/Dump/",
-			"vendor/chrismcmacken/phptools/Friend/",
-			"vendor/chrismcmacken/phptools/Logger/",
-			"vendor/chrismcmacken/phptools/PHPToolsTestBase/",
-			"vendor/chrismcmacken/phptools/Renamer/",
-			"vendor/chrismcmacken/phptools/Session2/",
-			"vendor/chrismcmacken/phptools/Skeleton/",
-			"vendor/chrismcmacken/phptools/SlimRoute/",
-			"vendor/chrismcmacken/phptools/Tokenizer/",
-			"vendor/chrismcmacken/phptools/Ultralite/",
-			"vendor/chrismcmacken/phptools/VariableStream/",
-			"vendor/chrismcmacken/phptools/WebRequest/",
-			"vendor/chrismcmacken/phptools/WebResponse/",
-			"vendor/chrismcmacken/phptools/ZipBuilder/"
+			"Cache/",
+			"Crypto/",
+			"DB/",
+			"DependencyInjectionContainer/",
+			"Dump/",
+			"Friend/",
+			"Logger/",
+			"PHPToolsTestBase/",
+			"Renamer/",
+			"Session2/",
+			"Skeleton/",
+			"SlimRoute/",
+			"Tokenizer/",
+			"Ultralite/",
+			"VariableStream/",
+			"WebRequest/",
+			"WebResponse/",
+			"ZipBuilder/"
 		]
 	}
 }
