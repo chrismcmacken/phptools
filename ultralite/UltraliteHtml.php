@@ -33,7 +33,7 @@
  acknowledgments.
  */
 
-require_once(__DIR__ . '/ultralite.class.php');
+require_once(__DIR__ . '/Ultralite.php');
 
 /**
  * Let's add HTML escaping to the output of all variables

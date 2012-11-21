@@ -13,7 +13,7 @@ How To Use
 This is fantastic because it is easy.  I shall illustrate:
 
     // Load the object, which registers the "var" stream wrapper
-    require_once('variablestream.class.php');
+    require_once('VariableStream.php');
 
     // Set up some content
     $GLOBALS['blah'] = "This is some sample content.\n';

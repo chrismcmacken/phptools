@@ -32,8 +32,8 @@
  acknowledgments.
  */
 
-require_once('ultralite.class.php');
-require_once('ultralitehtml.class.php');
+require_once('Ultralite.php');
+require_once('Ultralitehtml.php');
 
 class UltraliteTest extends PHPUnit_Framework_TestCase {
 	/**

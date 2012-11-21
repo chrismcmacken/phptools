@@ -32,10 +32,10 @@
  acknowledgments.
  */
 
-require_once(__DIR__ . '/db/base.class.php');
-require_once(__DIR__ . '/db/fluent.class.php');
-require_once(__DIR__ . '/db/fragment.class.php');
-require_once(__DIR__ . '/db/result.class.php');
+require_once(__DIR__ . '/db/Base.php');
+require_once(__DIR__ . '/db/Fluent.php');
+require_once(__DIR__ . '/db/Fragment.php');
+require_once(__DIR__ . '/db/Result.php');
 
 /**
  * Connect to a database and create chunks for use in DB classes
@@ -97,8 +97,8 @@ class DB {
 		// Fatally error if the support files do not exist
 		$filenameBase = __DIR__ . '/db/' . $components['scheme'] . '/';
 		$classNameBase = 'DB_' . ucfirst($components['scheme']) . '_';
-		require_once($filenameBase . 'handle.class.php');
-		require_once($filenameBase . 'result.class.php');
+		require_once($filenameBase . 'Handle.php');
+		require_once($filenameBase . 'Result.php');
 
 		if (! class_exists($classNameBase . 'Handle')) {
 			throw new Exception('Unloaded DB class: ' . $classNameBase . 'Handle');

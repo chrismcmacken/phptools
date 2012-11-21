@@ -1,8 +1,8 @@
 <?php
 
-require_once(__DIR__ . '/friend.class.php');
-require_once(__DIR__ . '/test_one.class.php');
-require_once(__DIR__ . '/test_two.class.php');
+require_once(__DIR__ . '/Friend.php');
+require_once(__DIR__ . '/test_one.php');
+require_once(__DIR__ . '/test_two.php');
 
 class FriendTest extends PHPUnit_Framework_TestCase {
 	public function dataAccess() {

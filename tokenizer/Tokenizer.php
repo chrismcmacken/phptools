@@ -50,8 +50,8 @@
  * prefer to call isset() instead of $this->valid().
  */
 
-require_once(__DIR__ . '/tokenizermatchstack.class.php');
-require_once(__DIR__ . '/tokenizertoken.class.php');
+require_once(__DIR__ . '/TokenizerMatchStack.php');
+require_once(__DIR__ . '/TokenizerToken.php');
 
 class Tokenizer implements ArrayAccess, Iterator {
 	const EXCEPTION_EXTENSION = 297671;
