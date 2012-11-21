@@ -66,7 +66,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function dataTokenize() {
-		return $this->getTestsFromDirectory('tests_tokenize');
+		return $this->getTestsFromDirectory(__DIR__ . '/tests_tokenize');
 	}
 
 
@@ -112,7 +112,7 @@ class TokenizerTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function dataFind() {
-		return $this->getTestsFromDirectory('tests_find');
+		return $this->getTestsFromDirectory(__DIR__ . '/tests_find');
 	}
 
 	/**
