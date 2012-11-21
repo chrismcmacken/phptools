@@ -52,7 +52,7 @@
 			"VariableStream": "vendor/chrismcmacken/VariableStream",
 			"WebRequest": "vendor/chrismcmacken/WebRequest",
 			"WebResponse": "vendor/chrismcmacken/WebResponse",
-			"ZipBuilder": "vendor/chrismcmacken/ZipBuilder",
+			"ZipBuilder": "vendor/chrismcmacken/ZipBuilder"
 		}
 	}
 }
