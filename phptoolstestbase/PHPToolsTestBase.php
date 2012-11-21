@@ -1,8 +1,8 @@
 <?php
 
-require_once(__DIR__ . '/../friend/Friend.class.php');
-require_once(__DIR__ . '/../renamer/Renamer.class.php');
-require_once(__DIR__ . '/../skeleton/Skeleton.class.php');
+require_once(__DIR__ . '/../friend/Friend.php');
+require_once(__DIR__ . '/../renamer/Renamer.php');
+require_once(__DIR__ . '/../skeleton/Skeleton.php');
 
 abstract class PHPToolsTestBase extends PHPUnit_Framework_TestCase {
 	protected $preservedCwd = null;
