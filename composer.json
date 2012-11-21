@@ -35,24 +35,24 @@
 	},
 	"autoload": {
 		"psr-0": {
-			"Cache": "vendor/chrismcmacken/Cache/",
-			"Crypto": "vendor/chrismcmacken/Crypto/",
-			"DB": "vendor/chrismcmacken/DB/",
-			"DependencyInjectionContainer": "vendor/chrismcmacken/DependencyInjectionContainer/",
-			"Dump": "vendor/chrismcmacken/Dump",
-			"Friend": "vendor/chrismcmacken/Friend",
-			"Logger": "vendor/chrismcmacken/Logger",
-			"PHPToolsTestBase": "vendor/chrismcmacken/PHPToolsTestBase",
-			"Renamer": "vendor/chrismcmacken/Renamer",
-			"Session2": "vendor/chrismcmacken/Session2",
-			"Skeleton": "vendor/chrismcmacken/Skeleton",
-			"SlimRoute": "vendor/chrismcmacken/SlimRoute",
-			"Tokenizer": "vendor/chrismcmacken/Tokenizer",
-			"Ultralite": "vendor/chrismcmacken/Ultralite",
-			"VariableStream": "vendor/chrismcmacken/VariableStream",
-			"WebRequest": "vendor/chrismcmacken/WebRequest",
-			"WebResponse": "vendor/chrismcmacken/WebResponse",
-			"ZipBuilder": "vendor/chrismcmacken/ZipBuilder"
+			"PHPTools\\Cache": "vendor/chrismcmacken/Cache/",
+			"PHPTools\\Crypto": "vendor/chrismcmacken/Crypto/",
+			"PHPTools\\DB": "vendor/chrismcmacken/DB/",
+			"PHPTools\\DependencyInjectionContainer": "vendor/chrismcmacken/DependencyInjectionContainer/",
+			"PHPTools\\Dump": "vendor/chrismcmacken/Dump",
+			"PHPTools\\Friend": "vendor/chrismcmacken/Friend",
+			"PHPTools\\Logger": "vendor/chrismcmacken/Logger",
+			"PHPTools\\PHPToolsTestBase": "vendor/chrismcmacken/PHPToolsTestBase",
+			"PHPTools\\Renamer": "vendor/chrismcmacken/Renamer",
+			"PHPTools\\Session2": "vendor/chrismcmacken/Session2",
+			"PHPTools\\Skeleton": "vendor/chrismcmacken/Skeleton",
+			"PHPTools\\SlimRoute": "vendor/chrismcmacken/SlimRoute",
+			"PHPTools\\Tokenizer": "vendor/chrismcmacken/Tokenizer",
+			"PHPTools\\Ultralite": "vendor/chrismcmacken/Ultralite",
+			"PHPTools\\VariableStream": "vendor/chrismcmacken/VariableStream",
+			"PHPTools\\WebRequest": "vendor/chrismcmacken/WebRequest",
+			"PHPTools\\WebResponse": "vendor/chrismcmacken/WebResponse",
+			"PHPTools\\ZipBuilder": "vendor/chrismcmacken/ZipBuilder"
 		}
 	}
 }
