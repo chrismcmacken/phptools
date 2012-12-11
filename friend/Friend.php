@@ -39,7 +39,7 @@ acknowledgments.
  * @throws ErrorException
  */
 
-require_once(__DIR__ . '/../skeleton/skeleton.class.php');
+require_once(__DIR__ . '/../skeleton/Skeleton.php');
 
 class Friend {
 

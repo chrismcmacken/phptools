@@ -31,7 +31,7 @@ variables and finally parse a sample template.  For this example, templates are
 stored in the `template/` subdirectory in your project.
 
     <?php
-    require_once('ultralite.class.php');
+    require_once('Ultralite.php');
     $ul = new Ultralite(__DIR__ . '/templates/');
     $ul->name = 'Jenny Doe';
     $ul->accountNumber = '8675309';
@@ -92,7 +92,7 @@ local variables.  This can cause confusion.  Here is some PHP code that will
 help illustrate my point.
 
     <?php // including_templates.php
-    require_once('../ultralite.class.php');
+    require_once('../Ultralite.php');
     $ul = new Ultralite(__DIR__);
     $ul->name = "Jane Doe";
     $ul->age = 42;

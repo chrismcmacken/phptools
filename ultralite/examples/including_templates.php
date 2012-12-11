@@ -1,5 +1,5 @@
 <?php // including_templates.php
-require_once('../ultralite.class.php');
+require_once('../Ultralite.php');
 $ul = new Ultralite(__DIR__);
 $ul->name = "Jane Doe";
 $ul->age = 42;

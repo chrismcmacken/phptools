@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once(__DIR__ . '/tokenizer.class.php');
+require_once(__DIR__ . '/Tokenizer.php');
 
 function countCalls($callback, $seconds = 10) {
 	$iterations = 0;

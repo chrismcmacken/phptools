@@ -107,16 +107,16 @@ class Renamer {
 	static public function getClassName($className) {
 		// Class names are case insensitive
 		$key = strtolower($className);
-		if (empty($this->renamedClasses[$key])) {
+		if (empty(self::$renamedClasses[$key])) {
 			return $className;
 		}
 		
-		if (! is_array($this->renamedClasses[$key])) {
-			return $this->renamedClasses[$key];
+		if (! is_array(self::$renamedClasses[$key])) {
+			return self::$renamedClasses[$key];
 		}
 	
-		$newName = array_shift($this->renamedClasses[$key]);
-		$this->renamedClasses[$key][] = $newName;
+		$newName = array_shift(self::$renamedClasses[$key]);
+		self::$renamedClasses[$key][] = $newName;
 		return $newName;
 	}
 
@@ -140,7 +140,7 @@ class Renamer {
 			$replacement = $originalName . 'Stub';
 		}
 
-		if (count($this->renamedClasses) === 0) {
+		if (count(static::$renamedClasses) === 0) {
 			// Reset, just in case
 			unset_new_overload();
 			set_new_overload(array('Renamer', 'getClassName'));
@@ -148,7 +148,7 @@ class Renamer {
 
 		// Class names are case insensitive
 		$key = strtolower($classname);
-		$this->renamedClasses[$key] = $replacement;
+		static::$renamedClasses[$key] = $replacement;
 	}
 
 
@@ -168,19 +168,19 @@ class Renamer {
 			$replacement = $originalName . 'Stub';
 		}
 
-		if (isset($this->renamedFunctions[$originalName])) {
+		if (isset(static::$renamedFunctions[$originalName])) {
 			throw new ErrorException($originalName . ' was already renamed.');
 		}
 
 		if (! is_string($replacement)) {
-			$this->callables[$originalName] = $replacement;
+			static::$callables[$originalName] = $replacement;
 			$newName = create_function('', "return call_user_func_array(Renamer::\$callables['" . $originalName . "'], func_get_args());");
 			$replacement = $newName;
 		}
 
 		$replacement = strtolower($replacement);
 		$this->doFunctionRename($originalName, $replacement);
-		$this->renamedFunctions[$originalName] = $replacement;
+		static::$renamedFunctions[$originalName] = $replacement;
 	}
 
 
@@ -192,17 +192,17 @@ class Renamer {
 	public function resetClass($className = null) {
 		if ($className) {
 			unset_new_overload();
-			$this->renamedClasses = array();
+			static::$renamedClasses = array();
 			return;
 		}
 
 		$key = strtolower($className);
 		
-		if (! empty($this->renamedClasses[$key])) {
-			unset($this->renamedClasses[$key]);
+		if (! empty(static::$renamedClasses[$key])) {
+			unset(static::$renamedClasses[$key]);
 		}
 
-		if (! count($this->renamedClasses)) {
+		if (! count(static::$renamedClasses)) {
 			unset_new_overload();
 		}
 	}
@@ -217,23 +217,23 @@ class Renamer {
 		if ($functionName) {
 			$key = strtolower($functionName);
 
-			if (! empty($this->renamedFunctions[$key])) {
-				$this->doFunctionRename($key, $this->renamedFunctions[$key]);
-				unset($this->renamedFunctions[$key]);
+			if (! empty(static::$renamedFunctions[$key])) {
+				$this->doFunctionRename($key, static::$renamedFunctions[$key]);
+				unset(static::$renamedFunctions[$key]);
 			}
 
-			if (! empty($this->callables[$functionName])) {
-				unset($this->callables[$functionName]);
+			if (! empty(static::$callables[$functionName])) {
+				unset(static::$callables[$functionName]);
 			}
 			
 			return;
 		}
 
-		foreach ($this->renamedFunctions as $original => $renamed) {
+		foreach (static::$renamedFunctions as $original => $renamed) {
 			$this->doFunctionRename($original, $renamed);
 		}
 
-		$this->renamedFunctions = array();
-		$this->callables = array();
+		static::$renamedFunctions = array();
+		static::$callables = array();
 	}
 }

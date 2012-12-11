@@ -32,7 +32,7 @@
  acknowledgments.
  */
 
-require_once('crypto.class.php');
+require_once('Crypto.php');
 
 class CryptoTest extends PHPUnit_Framework_TestCase {
 	/**

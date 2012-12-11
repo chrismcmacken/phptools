@@ -32,5 +32,27 @@
 	],
 	"require": {
 		"php": ">=5.3.0"
+	},
+	"autoload": {
+		"classmap": [
+			"cache/",
+			"crypto/",
+			"db/",
+			"dependencyinjectioncontainer/",
+			"dump/",
+			"friend/",
+			"logger/",
+			"phptoolstestbase/",
+			"renamer/",
+			"session2/",
+			"skeleton/",
+			"slimroute/",
+			"tokenizer/",
+			"ultralite/",
+			"variablestream/",
+			"webrequest/",
+			"webresponse/",
+			"zipbuilder/"
+		]
 	}
 }
