@@ -42,8 +42,9 @@
  */
 class Ultralite {
 	// Pattern for matching an argument without spaces or quoted argument
-	//    "([^\\"]|\\.)*"
-	static protected $argPattern = '[^"\'\s][^\s]*|"(?:[^\\\\"]|\\\\.)*"|\'(?:[^\\\\\']|\\\\.)*\'';
+	//    [^"'\s][^=\s]* or "([^\\"]|[\\.])*" or '[^\\']*'
+	// Must not match equals signs unless it is quoted
+	static protected $argPattern = '[^"\'\s][^=\s]*|"(?:[^\\\\"]|\\\\.)*"|\'(?:[^\\\\\']|\\\\.)*\'';
 	protected $baseDir = null;
 	protected $parsingFile = null;
 	protected $variables = array();

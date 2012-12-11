@@ -114,6 +114,12 @@ class UltraliteTest extends PHPUnit_Framework_TestCase {
 				'class_properties_crlf.tpl',
 				"Sample line 1\r\n\r\nWhat is your name?  Sir Henry\r\nWhat is your quest?  To run away\r\n\r\nFantastic!\r\n",
 			),
+			'parent_child' => array(
+				'Ultralite',
+				array(),
+				'parent.tpl',
+				"A:  A\nB:  B\nA:  A?b=B\nB:  Still just B\n",
+			),
 		);
 	}
 
