@@ -4,22 +4,22 @@ spl_autoload_register(function ($name) {
 	$filename = $name . '.php';
 	$filename = str_replace('_', DIRECTORY_SEPARATOR, $filename);
 	$paths = array(
-		'Cache',
-		'Crypto',
-		'DB',
-		'DependencyInjectionContainer',
-		'Dump',
-		'Friend',
-		'Logger',
-		'Renamer',
-		'Session2',
-		'SlimRoute',
-		'Tokenizer',
-		'Ultralite',
-		'VariableStream',
-		'WebRequest',
-		'WebResponse',
-		'ZipBuilder',
+		'cache',
+		'crypto',
+		'db',
+		'dependencyinjectioncontainer',
+		'dump',
+		'friend',
+		'logger',
+		'renamer',
+		'session2',
+		'slimroute',
+		'tokenizer',
+		'ultralite',
+		'variablestream',
+		'webrequest',
+		'webresponse',
+		'zipbuilder',
 	);
 
 	foreach ($paths as $path) {
