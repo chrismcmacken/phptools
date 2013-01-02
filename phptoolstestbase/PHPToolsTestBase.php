@@ -8,7 +8,7 @@ abstract class PHPToolsTestBase extends PHPUnit_Framework_TestCase {
 	protected $preservedCwd = null;
 	static protected $bufferLevel = null;
 	protected $renamer = null;  // Renamer from phptools
-	protected $stubWithMockCache = array();
+	static protected $stubWithMockCache = array();
 	
 	
 	/**
@@ -741,7 +741,7 @@ abstract class PHPToolsTestBase extends PHPUnit_Framework_TestCase {
 		// check that key to see if we need to build the object
 		$mockKey = serialize($mockInfo);
 
-		if (isset($this->stubWithMockCache[$mockKey])) {
+		if (!isset(self::$stubWithMockCache[$mockKey])) {
 			// First, we will need to generate or reuse a mock object as our base class
 			$mockObject = $this->getMockExceptMethods($className, $methodsToKeep, array(), '', false);
 			$skeleton = new Skeleton($mockObject);
@@ -754,16 +754,17 @@ abstract class PHPToolsTestBase extends PHPUnit_Framework_TestCase {
 
 			$skeleton->setConstructor($php);
 			$skeletonClass = $skeleton->create();
-			$this->stubWithMockCache[$mockKey] = array(
+			self::$stubWithMockCache[$mockKey] = array(
 				'class' => $skeletonClass
 			);
 		}
 
 		// The test needs to be friended to have access to methods
-		$mockClassName = $this->stubWithMockCache[$mockKey]['class'];
-		$this->stubWithMockCache[$mockKey]['test'] = new Friend($this);
-		$this->stubWithMockCache[$mockKey]['callback'] = $callback;
-		$this->renamer($className, $mockClassName);
+		$mockClassName = self::$stubWithMockCache[$mockKey]['class'];
+		require_once(__DIR__ . '/../dump/Dump.php');
+		self::$stubWithMockCache[$mockKey]['testFriend'] = new Friend($this);
+		self::$stubWithMockCache[$mockKey]['callback'] = $callback;
+		$this->renamer->renameClass($className, $mockClassName);
 
 		return $mockClassName;
 	}
@@ -773,15 +774,25 @@ abstract class PHPToolsTestBase extends PHPUnit_Framework_TestCase {
 	 * Call some callback in order to set up the mock that was stubbed
 	 * into your code.
 	 *
-	 * @param string $key Key in stubWithMockCache
+	 * @param string $key Key in $stubWithMockCache
 	 * @param Object $thisRef
 	 * @param array $arguments
 	 */
-	public function stubWithMockConstructor($key, $thisRef, $arguments) {
-		$callback = $this->stubWithMockCache[$key];
+	static public function stubWithMockConstructor($key, $thisRef, $arguments) {
+		$mockDef = self::$stubWithMockCache[$key];
+		$testFriend = $mockDef['testFriend'];
+		$callback = $mockDef['callback'];
 
+		// Register this mock with the array of mock objects
+		// Can't just use "$testFriend->mockObjects[] = $thisRef" due to how
+		// magic getters and setters work.
+		$mockArray = $testFriend->mockObjects;
+		$mockArray[] = $thisRef;
+		$testFriend->mockObjects = $mockArray;
+
+		// Call the setup function
 		if ($callback) {
-			call_user_func($callback, $thisRef, $arguments);
+			call_user_func($callback, $testFriend, $thisRef, $arguments);
 		}
 	}
 	
