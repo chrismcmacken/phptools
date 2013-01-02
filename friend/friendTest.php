@@ -125,6 +125,22 @@ class FriendTest extends PHPUnit_Framework_TestCase {
 
 
 	/**
+	 * Can we get the right property on the parent object?
+	 *
+	 * @dataProvider dataAccess
+	 * @param $access
+	 */
+	public function testPrivatePropertyOnParent($access) {
+		$testOne = new Test_Two();
+		$friend = new Friend($testOne);
+		$expected = 'testOne' . ucfirst($access);
+		$propertyName = $access . 'Property';
+		$actual = $friend->$propertyName;
+		$this->assertEquals($expected, $actual);
+	}
+
+
+	/**
 	 * How about static calls, especially with late static binding?
 	 *
 	 * @dataProvider dataStatic

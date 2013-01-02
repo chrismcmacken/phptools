@@ -256,20 +256,32 @@ class Friend {
 	}
 
 
-    /**
-     * Helper method that returns a ReflectionProperty that's been made public
-     *
-     * @param  $name
-     * @return ReflectionProperty
-     */
+	/**
+	 * Helper method that returns a ReflectionProperty that's been made public.
+	 *
+	 * Needs to walk up the ReflectionClass parents in order to search for
+	 * a private property in any of the parents.
+	 *
+	 * @param  $name
+	 * @return ReflectionProperty
+	 */
     protected function getProperty($name){
-		try {
-			$property = new ReflectionProperty($this->object, $name);
-			$property->setAccessible(true);
-			return $property;
-		} catch (Exception $e) {
-			// Do nothing
+		$reflectionClass = new ReflectionClass($this->object);
+
+		while ($reflectionClass) {
+			try {
+				// This throws if the property does not exist
+				$property = $reflectionClass->getProperty($name);
+				$property->setAccessible(true);
+				return $property;
+			} catch (Exception $e) {
+				// Do nothing, continue
+			}
+
+			// Not found, go higher
+			$reflectionClass = $reflectionClass->getParentClass();
 		}
+
 		return null;
     }
 
