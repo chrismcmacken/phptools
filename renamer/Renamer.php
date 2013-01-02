@@ -147,7 +147,7 @@ class Renamer {
 		}
 
 		// Class names are case insensitive
-		$key = strtolower($classname);
+		$key = strtolower($originalName);
 		static::$renamedClasses[$key] = $replacement;
 	}
 

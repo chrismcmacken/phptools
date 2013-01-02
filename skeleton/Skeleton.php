@@ -127,7 +127,7 @@ class Skeleton {
 			if (! $constructor->isFinal()) {
 				$out .= $this->methodDeclaration($constructor);
 				$out .= " {\n";
-				$out .= $this->constructorMethod($method);
+				$out .= $this->constructorMethod($constructor);
 				$out .= "}\n";
 			}
 		} else {
