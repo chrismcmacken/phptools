@@ -23,7 +23,7 @@ abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\We
 	 */
 	protected function assertArrayContains($expected, $actual, $message = '') {
 		$actualFiltered = PHPToolsTestUtil::arrayFilterKeys($actual, array_keys($expected));
-		$this->assertEquals($expected, $actual, $message);
+		$this->assertEquals($expected, $actualFiltered, $message);
 	}
 	
 	

@@ -29,7 +29,7 @@ abstract class PHPUnitTestBase extends PHPUnit_Framework_TestCase {
 	 */
 	protected function assertArrayContains($expected, $actual, $message = '') {
 		$actualFiltered = PHPToolsTestUtil::arrayFilterKeys($actual, array_keys($expected));
-		$this->assertEquals($expected, $actual, $message);
+		$this->assertEquals($expected, $actualFiltered, $message);
 	}
 	
 	
