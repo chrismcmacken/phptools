@@ -2,7 +2,7 @@
 
 // All of these tests *should fail* for a specific reason
 
-require_once(__DIR__ . '/PHPToolsTestBase.php');
+require_once(__DIR__ . '/PHPUnitTestBase.php');
 
 class A {
 	public function B($c) {
@@ -10,7 +10,7 @@ class A {
 	}
 }
 
-class PHPToolsTestBaseTest extends PHPToolsTestBase {
+class PHPToolsTestBaseTest extends PHPUnitTestBase {
 	// Parameter didn't match the mock
 	public function testStubWithMockFailsExpectation() {
 		$this->stubWithMock('A', function ($test, $mock, $args) {

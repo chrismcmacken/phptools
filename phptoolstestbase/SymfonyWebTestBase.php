@@ -2,13 +2,7 @@
 
 require_once(__DIR__ . '/PHPToolsTestUtil.php');
 
-abstract class PHPUnitTestBase extends PHPUnit_Framework_TestCase {
-	protected $preservedCwd = null;
-	static protected $bufferLevel = null;
-	protected $renamer = null;  // Renamer from phptools
-	static protected $stubWithMockCache = array();
-	
-	
+abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\WebTestCase {
 	/**
 	 * Force a database reset so data providers can hit a clean database
 	 */
@@ -178,7 +172,7 @@ abstract class PHPUnitTestBase extends PHPUnit_Framework_TestCase {
 			), $args);
 	}
 	
-
+	
 	/**
 	 * Pull a value from an internal PHPUnit private variable
 	 *
