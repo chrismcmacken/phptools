@@ -42,6 +42,7 @@
 			"dump/",
 			"friend/",
 			"logger/",
+			"loggingsoapclient/",
 			"phptoolstestbase/",
 			"renamer/",
 			"session2/",
