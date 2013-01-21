@@ -20,7 +20,7 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 	 * @param boolean $oneWay
 	 * @return array Configuration
 	 */
-	protected function configureForRequest($location, $action, $version) {
+	protected function configureForRequest($request, $location, $action, $version) {
 		// You should override this!
 		return array(
 			'path' => __DIR__ . '/' . $action,
@@ -101,7 +101,7 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 	 * @param boolean $oneWay If true, don't expect much of a response
 	 */
 	protected function transport($request, $location, $action, $version, $oneWay = 0) {
-		$config = $this->configureForRequest($location, $action, $version, $oneWay);
+		$config = $this->configureForRequest($request, $location, $action, $version, $oneWay);
 		$patterns = array();
 
 		if (! empty($config['swaps'])) {
