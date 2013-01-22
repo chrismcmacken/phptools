@@ -124,11 +124,11 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 		foreach (glob($dir . '/*_request.*') as $file) {
 			$fileContents = file_get_contents($file);
 			$outFile = str_replace('_request.', '_response.', $file);
-			$add = true;
 
 			// Look for an exact match
 			if (trim($fileContents) == $request) {
-				$modifiedResponse = $this->modifyTextWithPatterns($fileContents, $patterns);
+				$response = file_get_contents($outFile);
+				$modifiedResponse = $this->modifyTextWithPatterns($response, $patterns);
 				return $modifiedResponse;
 			}
 
@@ -136,7 +136,8 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 				$fileContentsXml = $this->formatXml($fileContents);
 
 				if ($requestXml === $fileContentsXml) {
-					$modifiedResponse = $this->modifyTextWithPatterns($fileContents, $patterns);
+					$response = file_get_contents($outFile);
+					$modifiedResponse = $this->modifyTextWithPatterns($response, $patterns);
 					return $modifiedResponse;
 				}
 			}
