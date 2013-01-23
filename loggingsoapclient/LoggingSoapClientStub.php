@@ -64,7 +64,7 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 
 		foreach ($swaps as $k => $v) {
 			if (preg_match('/(' . $k . ')/Um', $request, $matches)) {
-				$patterns['/' . $k . '/Um'] = $matches[1];
+				$patterns[$k] = $matches[1];
 			}
 		}
 
@@ -79,9 +79,11 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 		}
 
 		$patterns = array_keys($swaps);
+		array_walk($patterns, function (&$pattern) {
+			$pattern = '/' . $pattern . '/Um';
+		});
 		$replacements = array_values($swaps);
 		$modified = preg_replace($patterns, $replacements, $text);
-		$modified = $text;
 		return $modified;
 	}
 
@@ -124,7 +126,6 @@ class LoggingSoapClientStub extends LoggingSoapClientBase {
 		foreach (glob($dir . '/*_request.*') as $file) {
 			$fileContents = file_get_contents($file);
 			$outFile = str_replace('_request.', '_response.', $file);
-			$add = true;
 
 			// Look for an exact match
 			if (trim($fileContents) == $request) {
