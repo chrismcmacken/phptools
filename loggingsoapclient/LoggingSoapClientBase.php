@@ -203,7 +203,7 @@ class LoggingSoapClientBase extends SoapClient {
 	}
 
 
-	protected function makeHttpHeaders($request, $host, $action) {
+	protected function makeHttpHeaders($request, $location, $action) {
 		$urlParts = parse_url($location);
 		$headers = array();
 		$contentTypeSet = false;
