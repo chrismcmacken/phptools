@@ -10,6 +10,7 @@ abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\We
 		PHPToolsTestUtil::initialize();
 		parent::__construct($name, $data, $dataName);
 		PHPToolsTestUtil::resetState();
+		$this->resetEnvironment();
 	}
 	
 	
@@ -263,7 +264,19 @@ abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\We
 		return PHPUnitTestBase::renameFunction($originalFunction, $overrideFunction);
 	}
 	
-	
+
+	/**
+	 * Extend this method to reset statics, global variables, database
+	 * connections and the other things that you'll need to change.
+	 *
+	 * When this is done, your environment should be pristine and exactly
+	 * the same so every test executes in a clean state.
+	 */
+	protected function resetEnvironment() {
+		// Implement your things in here
+	}
+
+
 	/**
 	 * Overload the running of this test in case we only want to run
 	 * specific data sets
@@ -408,6 +421,7 @@ abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\We
 	public function setUp() {
 		parent::setUp();  // PHPUnit's setUp() method
 		PHPToolsTestUtil::resetState();
+		$this->resetEnvironment();
 	}
 	
 
@@ -462,6 +476,7 @@ abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\We
 	 * Return to a known good state after tests
 	 */
 	public function tearDown() {
+		$this->resetEnvironment();
 		PHPToolsTestUtil::resetState();
 		parent::tearDown();  // PHPUnit
 	}
