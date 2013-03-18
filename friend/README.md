@@ -104,7 +104,7 @@ This behavior differs from what things from *outside* your class might call.  Th
 
 ### Accessing Properties
 
-Because of the way that
+Because of the way that magic getters and setters work, you **can not** use code like the following to append a value to an array.
 
     /**
      * Gets $this->object->$name and makes the property public so we can fetch it
@@ -120,7 +120,7 @@ Because of the way that
 		}
 
 		return $this->callMagic('__get', array($name), 'Property ' . $name . ' does not exist');
-    } magic getters and setters work, you **can not** use code like the following to append a value to an array.
+    }
 
     // This does NOT work!
     $friend->someProperty[] = 'new array value';
