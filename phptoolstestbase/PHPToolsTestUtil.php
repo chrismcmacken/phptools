@@ -50,6 +50,7 @@ class PHPToolsTestUtil {
 		return $missing;
 	}
 
+
 	/**
 	 * Lazy-load it to prevent errors in those blessed environments that
 	 * do not want or need the test_helpers extension.
@@ -60,7 +61,10 @@ class PHPToolsTestUtil {
 		if (! self::$renamer) {
 			self::$renamer = new Renamer();
 		}
+
+		return self::$renamer;
 	}
+
 
 	/**
 	 * Exception matches what we expect
@@ -305,8 +309,9 @@ class PHPToolsTestUtil {
 	 * @param string $overrideFunction
 	 */
 	static public function renameFunction($originalFunction, $overrideFunction) {
-		return static::getRenamer()>renameFunction($originalFunction, $overrideFunction);
+		return static::getRenamer()->renameFunction($originalFunction, $overrideFunction);
 	}
+
 
 	/**
 	 * Resets Renamer if it's been used
@@ -492,7 +497,7 @@ class PHPToolsTestUtil {
 
 		$mockDef = self::$stubWithMockCache[$mockKey];
 		$mockDef->callback = null;
-		self::getRenamer()>renameClass($className, $mockDef->className);
+		self::getRenamer()->renameClass($className, $mockDef->className);
 		return $mockDef;
 	}
 
