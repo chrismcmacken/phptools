@@ -50,6 +50,17 @@ class PHPToolsTestUtil {
 		return $missing;
 	}
 
+	/**
+	 * Lazy-load it to prevent errors in those blessed environments that
+	 * use or need the test_helpers extension.
+	 *
+	 * @return Renamer
+	 */
+	static public function getRenamer() {
+		if (! self::$renamer) {
+			self::$renamer = new Renamer();
+		}
+	}
 
 	/**
 	 * Exception matches what we expect
@@ -236,9 +247,6 @@ class PHPToolsTestUtil {
 	 * Sets up the various static properties
 	 */
 	static public function initialize() {
-		if (is_null(self::$renamer)) {
-			self::$renamer = new Renamer();
-		}
 	}
 
 
@@ -297,9 +305,20 @@ class PHPToolsTestUtil {
 	 * @param string $overrideFunction
 	 */
 	static public function renameFunction($originalFunction, $overrideFunction) {
-		return static::$renamer->renameFunction($originalFunction, $overrideFunction);
+		return static::getRenamer()>renameFunction($originalFunction, $overrideFunction);
 	}
-	
+
+	/**
+	 * Resets Renamer if it's been used
+	 *
+	 * @return void
+	 */
+	static protected function resetRenamer() {
+		if (self::$renamer) {
+			self::$renamer->resetFunction();  // Reset function names
+			self::$renamer->resetClass();  // Reset class names
+		}
+	}
 	
 	/**
 	 * Force a consistent, clean, unmodified state.  This should reset
@@ -325,10 +344,9 @@ class PHPToolsTestUtil {
 		// libxml can keep errors around - remove them if we had any
 		libxml_clear_errors();  // Clear XML errors
 		
-		// Swap replaced things back to the normal ones
-		self::$renamer->resetFunction();  // Reset function names
-		self::$renamer->resetClass();  // Reset class names
-		
+		// Swap replaced things back to the normal ones if needed
+		self::resetRenamer();
+
 		// Set up superglobals, static references, etc
 		self::resetSuperglobals();
 		
@@ -474,7 +492,7 @@ class PHPToolsTestUtil {
 
 		$mockDef = self::$stubWithMockCache[$mockKey];
 		$mockDef->callback = null;
-		self::$renamer->renameClass($className, $mockDef->className);
+		self::getRenamer()>renameClass($className, $mockDef->className);
 		return $mockDef;
 	}
 
