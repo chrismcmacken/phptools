@@ -514,15 +514,5 @@ class PHPToolsTestUtil {
 			call_user_func($callback, $thisRef, $arguments);
 		}
 	}
-	
-
-	/**
-	 * Return to a known good state after tests
-	 */
-	public function tearDown() {
-		static::bufferReset();
-		static::resetState();
-		parent::tearDown();  // PHPUnit
-	}
 }
 
