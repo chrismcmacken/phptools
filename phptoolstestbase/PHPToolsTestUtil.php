@@ -52,7 +52,7 @@ class PHPToolsTestUtil {
 
 	/**
 	 * Lazy-load it to prevent errors in those blessed environments that
-	 * use or need the test_helpers extension.
+	 * do not want or need the test_helpers extension.
 	 *
 	 * @return Renamer
 	 */
