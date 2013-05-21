@@ -1,8 +1,0 @@
-Usage
----------------------------------------
-In order to use the friend class simply instantiate an object of the type you
-wish and pass it into the friend class constructor. Then call / access any 
-protected / private properties or method you wish. 
-
-$object = new stdClass();
-$publicObject = new Friend($object);
