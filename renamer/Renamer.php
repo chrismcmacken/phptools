@@ -34,11 +34,12 @@
  */
 
 /**
- * Using Sebastian Bergmann's test_helpers extension for PHP, we can
- * rename functions and classes.  This class is a helper to make things
- * easier for you.
+ * Using Sebastian Bergmann's test_helpers extension for PHP or the
+ * runkit extension, we can rename functions and classes.  This class
+ * is a helper to make things easier for you.
  *
  * test_helpers:  https://github.com/sebastianbergmann/php-test-helpers
+ * runkit:  https://github.com/zenovich/runkit
  */
 
 class Renamer {
@@ -52,8 +53,8 @@ class Renamer {
 	 * this stuff just doesn't work.
 	 */
 	public function __construct() {
-		if (! extension_loaded('test_helpers')) {
-			die('test_helpers extension not found');
+		if (! extension_loaded('test_helpers') && ! extension_loaded('runkit')) {
+			die('test_helpers extension and runkit extensions are not found - you need one of them');
 		}
 	}
 
@@ -75,12 +76,16 @@ class Renamer {
 	 * Perform actual function renaming.
 	 *
 	 * It actually swaps the two functions with each other, which is why
-	 * there are three calls to rename_function().
+	 * there are three calls to rename the function.
 	 *
 	 * @param string $originalName
 	 * @param string $replacement
 	 */
 	protected function doFunctionRename($originalName, $replacement) {
+		if (! extension_loaded('test_helpers') && ! extension_loaded('runkit')) {
+			die('test_helpers extension and runkit extensions are not found - you need one of them');
+		}
+
 		$this->confirmFunction($originalName);
 		$this->confirmFunction($replacement);
 		$tempName = $originalName . '_TEMP';
@@ -89,9 +94,16 @@ class Renamer {
 			$tempName .= substr(uniqid(), -4);
 		}
 
-		rename_function($originalName, $tempName);
-		rename_function($replacement, $originalName);
-		rename_function($tempName, $replacement);
+		// Runkit's function renaming works better in PHP 5.4
+		if (function_exists('runkit_function_rename')) {
+			runkit_function_rename($originalName, $tempName);
+			runkit_function_rename($replacement, $originalName);
+			runkit_function_rename($tempName, $replacement);
+		} else {
+			rename_function($originalName, $tempName);
+			rename_function($replacement, $originalName);
+			rename_function($tempName, $replacement);
+		}
 	}
 
 	
@@ -136,6 +148,10 @@ class Renamer {
 	 * @param string|array $replacement Replacement name or names
 	 */
 	public function renameClass($originalName, $replacement = null) {
+		if (! extension_loaded('test_helpers')) {
+			die('test_helpers extension is required');
+		}
+
 		if (is_null($replacement)) {
 			$replacement = $originalName . 'Stub';
 		}
@@ -190,6 +206,10 @@ class Renamer {
 	 * @param string|null $className Class's name to reset, null to reset all
 	 */
 	public function resetClass($className = null) {
+		if (! extension_loaded('test_helpers')) {
+			die('test_helpers extension is required');
+		}
+
 		if ($className) {
 			unset_new_overload();
 			static::$renamedClasses = array();
