@@ -22,7 +22,6 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 			 * (php.net) */
 			CURLOPT_DNS_USE_GLOBAL_CACHE => false,
 			CURLOPT_SSL_VERIFYHOST => false,
-			CURLOPT_SSL_VERIFYPEER => false,
 			CURLOPT_CUSTOMREQUEST => 'POST',
 			CURLOPT_HTTPHEADER => $headers,
 			CURLOPT_POSTFIELDS => $request,
@@ -33,11 +32,24 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 		if ($this->timeoutConnection) {
 			$curlOpts[CURLOPT_CONNECTTIMEOUT] = $this->timeoutConnection;
 		}
-
 		if ($this->timeoutSocket) {
 			$curlOpts[CURLOPT_TIMEOUT] = $this->timeoutSocket;
 		}
-		
+
+		$curlOpts[CURLOPT_SSL_VERIFYPEER] = ! $this->sslAllowSelfSigned;
+
+		if(true !== $this->sslAllowSelfSigned) {
+			if($this->sslCaPath) {
+				$curlOpts[CURLOPT_CAPATH] = $this->sslCaPath;
+			}
+			if($this->sslCaFile) {
+				$curlOpts[CURLOPT_SSLCERT] = $this->sslCaPath . '/' . $this->sslCaFile;
+			}
+		}
+
+		if($this->sslLocalCert) {
+			$curlOpts[CURLOPT_SSLKEY] = $this->sslLocalCert;
+		}
 		curl_setopt_array($curlHandle, $curlOpts);
 		return $curlHandle;
 	}
