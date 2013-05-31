@@ -16,6 +16,11 @@ class LoggingSoapClientBase extends SoapClient {
 	// Logging callback
 	protected $logger = null;
 	
+	//SSL Certificate options
+	protected $sslAllowSelfSigned = false;
+	protected $sslCaFile = null;
+	protected $sslCaPath = null;
+	protected $sslLocalCert = null;
 
 	// Timeout for the request, in seconds.  0 means no timeout.
 	protected $timeoutConnection = null;
@@ -35,6 +40,11 @@ class LoggingSoapClientBase extends SoapClient {
 			$this->timeoutSocket = $this->getOptionInteger($options, 'socket_timeout');
 			$this->timeoutWsdl = $this->getOptionInteger($options, 'wsdl_timeout', $this->timeoutSocket);
 			$this->closeConnection = $this->getOptionBoolean($options, 'connection_close', false);
+
+			$this->sslAllowSelfSigned = $this->getOptionBoolean($options, 'allow_self_signed', false);
+			$this->sslCaFile = $this->getOptionString($options, 'cafile');
+			$this->sslCaPath = $this->getOptionString($options, 'capath');
+			$this->sslLocalCert = $this->getOptionString($options, 'local_cert');
 		}
 
 		if ($this->timeoutWsdl) {
@@ -284,7 +294,7 @@ class LoggingSoapClientBase extends SoapClient {
 			'body' => null
 		);
 		$lines = explode("\r\n", $response);
-
+		
 		if ($hasStatus && count($lines)) {
 			$statusLine = array_shift($lines);
 			$statusLine = explode(" ", $statusLine);
