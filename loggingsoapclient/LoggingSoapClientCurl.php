@@ -6,7 +6,7 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 	protected function transport($request, $location, $action, $version, $oneWay) {
 		$curlHandle = $this->transportCurlSetup($request, $location, $action);
 		$rawResponse = curl_exec($curlHandle);
-		$response = $this->processTextResponse($request, false);
+		$response = $this->processTextResponse($rawResponse, true);
 		
 		$this->lastResponseHttpCode = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
 		$this->lastResposneHeaders = $response['headers'];
