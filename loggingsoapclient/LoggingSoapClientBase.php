@@ -162,6 +162,17 @@ class LoggingSoapClientBase extends SoapClient {
 		return $val;
 	}
 
+	protected function getOptionString($arr, $key, $default = null) {
+		if (! array_key_exists($key, $arr)) {
+                        return $default;
+                }
+
+                $val = $arr[$key];
+                settype($val, 'string');
+
+                return $val;
+	}
+
 
 	/**
 	 * Log some XML
