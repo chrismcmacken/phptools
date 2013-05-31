@@ -30,9 +30,8 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => true,  // Get response header as well
 		);
-
-		if ($this->timeoutConnect) {
-			$curlOpts[CURLOPT_CONNECTTIMEOUT] = $this->timeoutConnect;
+		if ($this->timeoutConnection) {
+			$curlOpts[CURLOPT_CONNECTTIMEOUT] = $this->timeoutConnection;
 		}
 
 		if ($this->timeoutSocket) {
