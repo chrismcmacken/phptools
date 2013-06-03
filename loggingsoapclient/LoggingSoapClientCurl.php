@@ -48,7 +48,7 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 		}
 
 		if($this->sslLocalCert) {
-			$curlOpts[CURLOPT_SSLKEY] = $this->sslLocalCert;
+			$curlOpts[CURLOPT_SSLCERT] = $this->sslLocalCert;
 		}
 		curl_setopt_array($curlHandle, $curlOpts);
 		return $curlHandle;
