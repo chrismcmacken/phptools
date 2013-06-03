@@ -43,7 +43,7 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 				$curlOpts[CURLOPT_CAPATH] = $this->sslCaPath;
 			}
 			if($this->sslCaFile) {
-				$curlOpts[CURLOPT_SSLCERT] = $this->sslCaPath . '/' . $this->sslCaFile;
+				$curlOpts[CURLOPT_CAINFO] = $this->sslCaPath . '/' . $this->sslCaFile;
 			}
 		}
 
