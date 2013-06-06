@@ -3,6 +3,12 @@
 require_once(__DIR__ . '/LoggingSoapClientBase.php');
 
 class LoggingSoapClientCurl extends LoggingSoapClientBase {
+
+	protected function addCurlHeaders(array $headers) {
+		$headers[] = 'Expect:';
+		return $headers;
+	}
+
 	protected function transport($request, $location, $action, $version, $oneWay) {
 		$curlHandle = $this->transportCurlSetup($request, $location, $action);
 		$rawResponse = curl_exec($curlHandle);
@@ -16,6 +22,7 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 
 	protected function transportCurlSetup($request, $location, $action) {
 		$headers = $this->makeHttpHeaders($request, $location, $action);
+		$headers = $this->addCurlHeaders($headers);
 		$curlHandle = curl_init($location);
 		$curlOpts = array(
 			/* "This option is not thread-safe and is enabled by default"
