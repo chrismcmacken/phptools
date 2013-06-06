@@ -231,8 +231,7 @@ class LoggingSoapClientBase extends SoapClient {
 
 		// Required for HTTP/1.1, acceptable for HTTP/1.0
 		$headers[] = "Host: " . $urlParts['host'];
-		$headers[] = 'Expect:';
-		$headers[] = "SOAPAction: $action";
+		$headers[] = 'SoapAction: "' . $action . '"';
 
 		foreach ($this->httpHeaders as $header) {
 			$line = explode(':', $header);
