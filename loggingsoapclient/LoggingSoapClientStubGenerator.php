@@ -103,6 +103,9 @@ class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 			$this->logCallback('A SOAP response stub already exists in: ' . $responseFilename, $response);
 			$this->logCallback('No SOAP stubs were generated.');
 			return $response;
+		} else {
+			// A response was found, but we want to overwrite it.
+			$this->logCallback('SOAP stubs will be overwritten.');
 		}
 		
 		$this->writeRequest($modifiedRequest, $requestFilename);
