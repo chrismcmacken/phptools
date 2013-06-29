@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/LoggingSoapClientStub.php');
+
 class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 	/**
 	 * Whether or not we want to always generate a stub.
