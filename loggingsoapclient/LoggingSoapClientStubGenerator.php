@@ -18,6 +18,25 @@ class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 	 */
 	protected $filenamePrefix;
 	
+	/**
+	 * SOAP Client configuration.
+	 * 
+	 * @var array
+	 */
+	protected $options;
+	
+	
+	/**
+	 * @var string
+	 */
+	protected $wsdl;
+	
+	
+	public function __construct($wsdl, $options = array()) {
+		$this->wsdl = $wsdl;
+		$this->options = $options;
+		parent::__construct($wsdl, $options);
+	}
 	
 	/**
 	 * Writes the request to the filesystem and logs a message.
@@ -99,7 +118,8 @@ class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 		$response = $this->scanDirectory($folder, $modifiedRequest, $patterns);
 		
 		if (! $response) {
-			$response = parent::__doRequest($request, $location, $action, $version, $oneWay);
+			$client = new SoapClient($this->wsdl, $this->options);
+			$response = $client::__doRequest($request, $location, $action, $version, $oneWay);
 			$modifiedResponse = $this->modifyTextWithPatterns($response, $patterns);
 		} elseif (! $this->alwaysGenerate) {
 			$this->logCallback('A SOAP response stub already exists in: ' . $responseFilename, $response);
