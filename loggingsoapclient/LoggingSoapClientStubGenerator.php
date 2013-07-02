@@ -12,13 +12,19 @@ class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 	
 	
 	/**
+	 * @var SoapClient
+	 */
+	protected $client;
+	
+	
+	/**
 	 * Filename prefix to use.
 	 * 
 	 * @var string
 	 */
 	protected $filenamePrefix;
 	
-	
+		
 	/**
 	 * Writes the request to the filesystem and logs a message.
 	 * Does not modify the request since transport() does this for us.
@@ -55,6 +61,20 @@ class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 	 */
 	public function setAlwaysGenerate($alwaysGenerate = true) {
 		$this->alwaysGenerate = ! empty($alwaysGenerate);
+		return $this;
+	}
+	
+	
+	/**
+	 * Assigns the SoapClient we intend to use for REAL requests.
+	 * By assigning the client you want here, we can switch between
+	 * any of the other LoggingSoapClient types as needed.
+	 * 
+	 * @param SoapClient $client
+	 * @return LoggingSoapClientStubGenerator
+	 */
+	public function setClient(\SoapClient $client) {
+		$this->client = $client;
 		return $this;
 	}
 	
@@ -99,7 +119,7 @@ class LoggingSoapClientStubGenerator extends LoggingSoapClientStub {
 		$response = $this->scanDirectory($folder, $modifiedRequest, $patterns);
 		
 		if (! $response) {
-			$response = parent::__doRequest($request, $location, $action, $version, $oneWay);
+			$response = $this->client::__doRequest($request, $location, $action, $version, $oneWay);
 			$modifiedResponse = $this->modifyTextWithPatterns($response, $patterns);
 		} elseif (! $this->alwaysGenerate) {
 			$this->logCallback('A SOAP response stub already exists in: ' . $responseFilename, $response);
