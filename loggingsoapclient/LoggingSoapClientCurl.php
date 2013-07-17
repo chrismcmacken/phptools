@@ -35,7 +35,7 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 			CURLOPT_ENCODING => '',  // Sets to all supported types
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_HEADER => true,  // Get response header as well
-			CURL_HTTP_VERSION_1_0 => true, //if we don't force HTTP 1.0 sometimes things take a really long time to close the connection
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_0, //if we don't force HTTP 1.0 sometimes things take a really long time to close the connection
 		);
 		if ($this->timeoutConnection) {
 			$curlOpts[CURLOPT_CONNECTTIMEOUT] = $this->timeoutConnection;
