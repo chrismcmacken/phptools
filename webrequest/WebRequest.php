@@ -48,6 +48,7 @@ class WebRequest {
 	protected $get;
 	protected $post;
 
+
 	/**
 	 * Copy in the data from the superglobals and unset the originals so
 	 * we force programmers to use this object instead.
@@ -64,8 +65,10 @@ class WebRequest {
 		$this->files = $_FILES ?: array();
 		$this->get = $_GET ?: array();
 
-		// Only process POST variables if the request is a POST
-		if ($this->isPost()) {
+		if ($this->xDomainRequestPost() !== null) {
+			$this->post = $this->xDomainRequestPost();
+		} elseif ($this->isPost()) {
+			// Only process POST variables if the request is a POST
 			$this->post = $_POST ?: array();
 		} else {
 			$this->post = array();
@@ -158,7 +161,9 @@ class WebRequest {
 	/**
 	 * Returns data that was sent in the request.  This may not work well for
 	 * POST since PHP already parsed the input to provide the script with
-	 * the $_POST superglobal.
+	 * the $_POST superglobal.  PHP's manual suggests to use this method
+	 * to get the raw POST data instead of the $HTTP_RAW_POST_DATA global
+	 * variable.
 	 *
 	 * When dealing with large amounts of data, you may wish to use
 	 * inputDataToFile() instead.
@@ -166,7 +171,13 @@ class WebRequest {
 	 * @return string
 	 */
 	public function inputData() {
-		return file_get_contents('php://input');
+		static $contents = null;
+
+		if (is_null($contents)) {
+			$contents = file_get_contents('php://input');
+		}
+
+		return $contents;
 	}
 
 	/**
@@ -498,5 +509,25 @@ class WebRequest {
 		}
 
 		return implode('?', $uri);
+	}
+
+
+	/**
+	 * Returns null if the request is not an POST request from Internet
+	 * Explorer using XDomainRequest for CORS.  Returns an array of POST
+	 * variables otherwise
+	 *
+	 * @return null|array
+	 */
+	public function xDomainRequestPost() {
+		if (!$this->isPost()) {
+			return null;
+		}
+
+		if (strtolower($_SERVER['CONTENT_TYPE']) !== 'text/plain') {
+			return null;
+		}
+
+		return parse_str($this->inputData());
 	}
 }
