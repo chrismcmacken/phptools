@@ -15,7 +15,7 @@ class LoggingSoapClientCurl extends LoggingSoapClientBase {
 		$response = $this->processTextResponse($rawResponse, true);
 		
 		$this->lastResponseHttpCode = curl_getinfo($curlHandle, CURLINFO_HTTP_CODE);
-		$this->lastResposneHeaders = $response['headers'];
+		$this->lastResponseHttpHeaders = $response['headers'];
 		return $response['body'];
 	}
 
