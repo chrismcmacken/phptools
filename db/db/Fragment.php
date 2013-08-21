@@ -44,7 +44,7 @@ class DB_Fragment {
 	const LIKE = 'like';
 	const LT = 'lt';
 	const LTE = 'lte';
-	const NOT = 'now';
+	const NOT = 'not';
 	const NOW = 'now';
 
 	protected $args;
