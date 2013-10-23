@@ -81,7 +81,7 @@ abstract class SymfonyWebTestBase extends Symfony\Bundle\FrameworkBundle\Test\We
 	
 	
 	protected function bufferStop() {
-		return PHPToolsTestUtil::bufferStart();
+		return PHPToolsTestUtil::bufferStop();
 	}
 	
 	
